@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<title>Prince of the Rationality</title>
+<script src="extern/es5-shim.min.js"></script>
+<script src="extern/es5-sham.min.js"></script>
+<script src="extern/pixi.js"></script>
+<script>
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPLv3+
+// Needed for node-webkit compatibility.
+window.require = {
+    skipDataMain: true
+};
+// @license-end
+</script>
+<script src="extern/require.js"></script>
+</head>
+<body>
+<p>Prince of the Rationality is an RPG game about Bayesian updating.</p>
+<noscript><p>Your browser does not seem to have Javascript enabled.</p></noscript>
+</body>
+<script>
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPLv3+
+document.body.innerHTML = '';
+require(['main'], function (main) {
+main(PIXI, requestAnimFrame, document, window);
+});
+// @license-end
+</script>
+</html>

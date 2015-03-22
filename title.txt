@@ -1,0 +1,22 @@
+卜筮 bokuzei "divination"
+卜 boku "prophecy" "forecast"
+卜者 bokusha "diviner"
+
+ベイズ beizu "Bayes" - katakana, indicating foreign word
+
+使い tsukai "use/user"
+
+王子 ouji "prince"
+
+卜者王子
+卜(ベイズ)者王子
+"beizushaouji"
+
+note: "卜" is given furigana of "ベイズ"
+
+ﾍﾞｲｽﾞ
+ 卜  者  王  子
+
+Furigana is often hiragana, so a katakana furigana often
+implies that a foreign word is actually what is said, but
+the kanji is the meaning of the foreign word.
