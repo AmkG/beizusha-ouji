@@ -25,7 +25,7 @@
  * for the JavaScript code in this page.
  *
  */
-define(["engine"], function(engine) {
+define(["engine", "screen/loading"], function(engine, screenLoading) {
 
 function main() {
   // ignore mouse events.
@@ -38,7 +38,8 @@ function main() {
 
   /* Initialize engine.  */
   engine.initialize("Prince of the Rationality");
-  // TODO: loading screen.
+
+  engine.loadingScreen(screenLoading);
 
   engine.preload([]);
 
