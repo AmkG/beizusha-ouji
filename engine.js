@@ -205,7 +205,6 @@ Engine.prototype.loop = function() {
     self._top.scale.x   = canvasSize.scale;
     self._top.scale.y   = canvasSize.scale;
     self._renderer.resize(w, h);
-    console.log("resize: scale = " + canvasSize.scale);
   }
   window.addEventListener('resize', resize, false);
   resize();
