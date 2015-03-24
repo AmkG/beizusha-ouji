@@ -117,8 +117,10 @@ function Engine() {
 
   this._screenTable = new Table();
 
-  this._renderer = null;
-  this._stage = null;
+  /* PIXI objects.  */
+  this._renderer    = null; // The renderer.
+  this._stage       = null; // The viewgraph root.
+  this._top         = null; // The scaled root.
 }
 Engine.prototype.initialize = function (name, PIXI, document, window) {
   if (this._engineState !== "uninitialized") {
@@ -191,11 +193,15 @@ Engine.prototype.loop = function() {
   this._renderer = PIXI.autoDetectRecommendedRenderer(
     canvasSize.w, canvasSize.h
   );
+
   var canvas = this._renderer.view;
-  this._stage = new PIXI.Stage(0x000000);
   document.body.appendChild(canvas);
   canvas.style.display  = "block";
   canvas.style.position = "absolute";
+
+  this._stage = new PIXI.Stage(0x000000);
+  this._top = new PIXI.DisplayObjectContainer();
+  this._stage.addChild(this._top);
 
   /* Initialize the resize handler.  */
   function resize() {
@@ -204,9 +210,10 @@ Engine.prototype.loop = function() {
     var h = Math.floor(canvasSize.h);
     canvas.style.left   = Math.floor(canvasSize.ox) + "px";
     canvas.style.top    = Math.floor(canvasSize.oy) + "px";
-    self._stage.scale.x = canvasSize.scale;
-    self._stage.scale.y = canvasSize.scale;
+    self._top.scale.x   = canvasSize.scale;
+    self._top.scale.y   = canvasSize.scale;
     self._renderer.resize(w, h);
+    console.log("resize: scale = " + canvasSize.scale);
   }
   window.addEventListener('resize', resize, false);
   resize();
