@@ -99,19 +99,27 @@ function computeCanvasSize(vw, vh) {
          };
 }
 
+/* Main Engine class.  */
 function Engine() {
   this._name = "";
 
   this._loadingScreen = defaultLoadingScreen;
   this._screen = "";
-  this._state = null;
+  this._state = {};
   this._toLoad = [];
+
+  /* API objects.  */
+  this._api = null; /* Limited API.  */
+  this._apiUpdate = null; /* API for update.  */
 
   /* The virtual width and height.  */
   this._vw = 640;
   this._vh = 360;
 
+  /* Engine state.  */
   this._engineState = "uninitialized";
+  /* True if the current screen has been entered.  */
+  this._initializedScreen = false;
 
   this._screenTable = new Table();
 
@@ -176,6 +184,30 @@ Engine.prototype.initialState = function(state) {
 };
 /* Private functions used by Engine.prototype.loop.  */
 function launchStateSaving(self) {
+  /* Saves the state of the game engine to offline storage.  */
+
+  function core() {
+    self._offlineStore.access(function (storage) {
+      storage.setItem("screen", self._screen);
+      storage.setItem("state", JSON.stringify(self._state));
+    }).then(function (result) {
+      setTimeout(core, 3400);
+    });
+  }
+  setImmediate(core);
+}
+function enterScreen(self) {
+  /* Launches the screen enter function.  */
+  var screenDef = self._screenTable.get(self._screen);
+  if (screenDef.enter) {
+    screenDef.enter(self._api);
+  }
+  self._initializedScreen = true;
+  self._state = "running";
+  self._offlineStore.access(function (storage) {
+    storage.setItem("screen", self._screen);
+    storage.setItem("state", JSON.stringify(self._state));
+  });
 }
 function launchScreenLoading(self) {
   function core() {
@@ -192,17 +224,24 @@ function launchScreenLoading(self) {
         }
       });
     } else {
-      self._state = "running";
+      enterScreen(self);
     }
   }
+  self._state = "loading";
   setImmediate(core);
 }
 function setScreen(self, screen) {
+  if (self._initializedScreen) {
+    var screenDef = self._screenTable.get(self._screen);
+    if (screenDef.leave) {
+      screenDef.leave(self._api);
+    }
+    self._initializedScreen = false;
+  }
   self._screen = screen;
   if (self._screenTable.has(screen)) {
-    self._state = "running";
+    enterScreen(self);
   } else {
-    self._state = "loading";
     self._toLoad.push(screen);
     launchScreenLoading(self);
   }
@@ -249,9 +288,31 @@ Engine.prototype.loop = function() {
   window.addEventListener('resize', resize, false);
   resize();
 
+  /* Setup API.  */
+  this._api = {
+    stage: this._stage,
+    top: this._top,
+    state: this._state
+  };
+  this._apiUpdate = {
+    stage: this._stage,
+    top: this._top,
+    state: this._state,
+    setScreen: function (screen) {
+      setScreen(self, screen);
+    }
+  };
+
   /* Game loop.  */
   function onUpdate() {
-    // TODO: content.
+    if (self._engineState === "loading") {
+      self._loadingScreen(self._api);
+    } else if (self._engineState === "running") {
+      var screenDef = self._screenTable.get(self._screen);
+      if (screenDef.update) {
+        screenDef.update(self._apiUpdate);
+      }
+    }
     requestAnimFrame(render);
   }
   function render() {
