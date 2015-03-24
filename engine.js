@@ -203,7 +203,7 @@ function enterScreen(self) {
     screenDef.enter(self._api);
   }
   self._initializedScreen = true;
-  self._state = "running";
+  self._engineState = "running";
   self._offlineStore.access(function (storage) {
     storage.setItem("screen", self._screen);
     storage.setItem("state", JSON.stringify(self._state));
@@ -227,7 +227,7 @@ function launchScreenLoading(self) {
       enterScreen(self);
     }
   }
-  self._state = "loading";
+  self._engineState = "loading";
   setImmediate(core);
 }
 function setScreen(self, screen) {
@@ -318,7 +318,6 @@ Engine.prototype.loop = function() {
   function render() {
     self._renderer.render(self._stage);
   }
-  setInterval(onUpdate, 40);
 
   /* Recover game state from offline storage.  */
   this._offlineStore = new OfflineStorage(this._name);
@@ -337,6 +336,8 @@ Engine.prototype.loop = function() {
 
     // Launch the game state saving "thread".
     launchStateSaving(self);
+    // Launch the loop.
+    setInterval(onUpdate, 40);
   });
 
   return this;
