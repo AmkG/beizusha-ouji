@@ -42,7 +42,8 @@ function main() {
 
   engine.preload([]);
 
-  // TODO: Initial state and initial screen.
+  engine.initialState({});
+  engine.initialScreen("screen/mainMenu");
 
   /* Enter engine loop.  */
   engine.loop();

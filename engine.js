@@ -26,8 +26,8 @@
  *
  */
 
-define(["util/Table" , "pixi"],
-function(Table       ,  PIXI) {
+define(["util/Table", "util/OfflineStorage", "pixi"],
+function(Table      , OfflineStorage       ,  PIXI) {
 
 /*
 engine.initialize("game name");
@@ -119,6 +119,9 @@ function Engine() {
   this._renderer    = null; // The renderer.
   this._stage       = null; // The viewgraph root.
   this._top         = null; // The scaled root.
+
+  /* Offline storage.  */
+  this._offlineStore = null;
 }
 Engine.prototype.initialize = function (name) {
   if (this._engineState !== "uninitialized") {
@@ -171,6 +174,40 @@ Engine.prototype.initialState = function(state) {
   this._state = state;
   return this;
 };
+/* Private functions used by Engine.prototype.loop.  */
+function launchStateSaving(self) {
+}
+function launchScreenLoading(self) {
+  function core() {
+    if (self._toLoad.length > 0) {
+      var screen = self._toLoad.shift();
+      require([screen], function (screenDef) {
+        self._screenTable.set(screen, screenDef);
+        if (screenDef.assets) {
+          var loader = new PIXI.AssetLoader(screenDef.assets);
+          loader.onComplete = core;
+          loader.load();
+        } else {
+          setImmediate(core);
+        }
+      });
+    } else {
+      self._state = "running";
+    }
+  }
+  setImmediate(core);
+}
+function setScreen(self, screen) {
+  self._screen = screen;
+  if (self._screenTable.has(screen)) {
+    self._state = "running";
+  } else {
+    self._state = "loading";
+    self._toLoad.push(screen);
+    launchScreenLoading(self);
+  }
+}
+/* Actual loop implementation.  */
 Engine.prototype.loop = function() {
   var self          = this;
 
@@ -222,7 +259,24 @@ Engine.prototype.loop = function() {
   }
   setInterval(onUpdate, 40);
 
-  /* TODO: recover game state from offline storage.  */
+  /* Recover game state from offline storage.  */
+  this._offlineStore = new OfflineStorage(this._name);
+  this._offlineStore.access(function (storage) {
+    var screen = storage.getItem("screen") || self._screen;
+    var state = storage.getItem("state");
+    if (state) {
+      state = JSON.parse(state);
+    } else {
+      state = self._state;
+    }
+    return {screen: screen, state: state};
+  }).then(function (result) {
+    self._state = result.state;
+    setScreen(self, result.screen);
+
+    // Launch the game state saving "thread".
+    launchStateSaving(self);
+  });
 
   return this;
 };
