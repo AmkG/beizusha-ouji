@@ -27,7 +27,7 @@
  */
 define(["engine"], function(engine) {
 
-function main(PIXI, requestAnimFrame, document, window) {
+function main() {
   // ignore mouse events.
   function ignoreMouseEvent(e) {
     e = e || window.event;
@@ -37,7 +37,7 @@ function main(PIXI, requestAnimFrame, document, window) {
   window.addEventListener('mousedown', ignoreMouseEvent, true);
 
   /* Initialize engine.  */
-  engine.initialize("Prince of the Rationality", PIXI, document, window);
+  engine.initialize("Prince of the Rationality");
   // TODO: loading screen.
 
   engine.preload([]);
@@ -48,7 +48,7 @@ function main(PIXI, requestAnimFrame, document, window) {
   engine.loop();
 }
 
-function initialize(PIXI, requestAnimFrame, document, window) {
+function initialize() {
   var called = false;
 
   function nullFun() {}
@@ -58,7 +58,7 @@ function initialize(PIXI, requestAnimFrame, document, window) {
       document.removeEventListener("DOMContentLoaded", onDOMContentLoaded, false);
       window.removeEventListener("load", onDOMContentLoaded, false);
       document.onreadystatechange = nullFun;
-      main(PIXI, requestAnimFrame, document, window);
+      main();
     }
   }
   function onreadystatechange() {

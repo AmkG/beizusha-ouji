@@ -26,11 +26,12 @@
  *
  */
 
-define(["util/Table"], function (Table) {
+define(["util/Table" , "pixi"],
+function(Table       ,  PIXI) {
 
 /*
-engine.initialize("game name", PIXI, document, window);
-- Initialize the game engine, providing the given globals.
+engine.initialize("game name");
+- Initialize the game engine.
 
 engine.setVirtualResolution(640, 360);
 - Set the virtual resolution of the game engine.
@@ -63,7 +64,7 @@ engine.loop();
 function defaultLoadingScreen(api) {
 }
 
-function computeCanvasSize(window, document, vw, vh) {
+function computeCanvasSize(vw, vh) {
   var w = window.innerWidth ||
           document.documentElement.clientWidth;
   var h = window.innerHeight ||
@@ -100,9 +101,6 @@ function computeCanvasSize(window, document, vw, vh) {
 
 function Engine() {
   this._name = "";
-  this._PIXI = null;
-  this._document = null;
-  this._window = null;
 
   this._loadingScreen = defaultLoadingScreen;
   this._screen = "";
@@ -122,16 +120,13 @@ function Engine() {
   this._stage       = null; // The viewgraph root.
   this._top         = null; // The scaled root.
 }
-Engine.prototype.initialize = function (name, PIXI, document, window) {
+Engine.prototype.initialize = function (name) {
   if (this._engineState !== "uninitialized") {
     alert("error: engine: multiple initialize.");
     throw new Error("engine: multiple initialize.");
   }
 
   this._name = name;
-  this._PIXI = PIXI;
-  this._document = document;
-  this._window = window;
 
   this._engineState = "initialized";
 
@@ -177,9 +172,6 @@ Engine.prototype.initialState = function(state) {
 };
 Engine.prototype.loop = function() {
   var self          = this;
-  var PIXI          = this._PIXI;
-  var document      = this._document;
-  var window        = this._window;
 
   if (this._engineState !== "initialized") {
     alert("error: engine: cannot start loop now.");
@@ -189,7 +181,7 @@ Engine.prototype.loop = function() {
   this._engineState = "loading";
 
   /* Initialize the canvas to display.  */
-  var canvasSize = computeCanvasSize(window, document, this._vw, this._vh);
+  var canvasSize = computeCanvasSize(this._vw, this._vh);
   this._renderer = PIXI.autoDetectRecommendedRenderer(
     canvasSize.w, canvasSize.h
   );
@@ -205,7 +197,7 @@ Engine.prototype.loop = function() {
 
   /* Initialize the resize handler.  */
   function resize() {
-    var canvasSize = computeCanvasSize(window, document, self._vw, self._vh);
+    var canvasSize = computeCanvasSize(self._vw, self._vh);
     var w = Math.floor(canvasSize.w);
     var h = Math.floor(canvasSize.h);
     canvas.style.left   = Math.floor(canvasSize.ox) + "px";
