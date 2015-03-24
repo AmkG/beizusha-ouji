@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<script src="extern/setImmediate.js"></script>
+<script src="util/OfflineStorage.js"></script>
+<script>
+function test() {
+  var os = new OfflineStorage("testOfflineStorage");
+  os.access(function (storage) {
+    var ov = storage.getItem("key");
+    var nv;
+
+    if (typeof ov === "undefined") {
+      nv = 0;
+    } else {
+      nv = ov + 1;
+    }
+
+    storage.setItem("key", nv);
+    return {ov: ov, nv: nv};
+  }).then(function (result) {
+    alert("old value: " + result.ov + ", new value: " + result.nv);
+  });
+}
+</script>
+</head>
+<body onload="test();">
+</body>
+</html>
