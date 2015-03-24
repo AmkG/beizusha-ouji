@@ -204,7 +204,7 @@ function loadStep(self) {
     var screen = self._toLoad.shift();
     require([screen], function (screenDef) {
       if (screenDef.assets) {
-        var loader = new PIXI.AssetLoader(screenDefs.assets);
+        var loader = new PIXI.AssetLoader(screenDef.assets);
         loader.onComplete = function () {
           self._screenTable.set(screen, screenDef);
         };
