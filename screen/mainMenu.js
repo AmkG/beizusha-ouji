@@ -25,9 +25,47 @@
  * for the JavaScript code in this page.
  *
  */
-define([], function() {
+define(['pixi'], function(PIXI) {
+"use strict";
 
-mainMenu = {};
+var title = null;
+var blurFilter = new PIXI.BlurFilter();
+
+var progress = 0.0;
+var progressStep = 0.025;
+var maxBlurX = 2.0;
+var maxBlurY = 15.0;
+
+var mainMenu = {};
+mainMenu.assets = [
+  "img/title.png"
+];
+mainMenu.enter = function(api) {
+  api.top.removeChildren();
+  progress = 0.0;
+  blurFilter.blur = 0.0;
+  if (!title) {
+    title = PIXI.Sprite.fromImage("img/title.png");
+    title.scale.x = 0.5;
+    title.scale.y = 0.5;
+    title.position.x = 20;
+    title.position.y = (360 - title.height) / 2;
+    title.filters = [blurFilter];
+  }
+  api.top.addChild(title);
+
+  api.stage.setBackgroundColor(0xFFFFFF);
+};
+mainMenu.update = function(api) {
+  if (progress < 1.0) {
+    progress += progressStep;
+    if (progress >= 1.0) {
+      progress = 1.0;
+    }
+    blurFilter.blurX = progress * maxBlurX;
+    blurFilter.blurY = progress * maxBlurY;
+  }
+};
 
 return mainMenu;
 });
