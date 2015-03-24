@@ -25,7 +25,7 @@
  * for the JavaScript code in this page.
  *
  */
-define([], function() {
+define(["engine"], function(engine) {
 
 function main(PIXI, requestAnimFrame, document, window) {
   // ignore mouse events.
@@ -36,10 +36,16 @@ function main(PIXI, requestAnimFrame, document, window) {
   }
   window.addEventListener('mousedown', ignoreMouseEvent, true);
 
-  /* TODO: Initialize engine.  */
-  /* TODO: Initialize screens.  */
-  /* TODO: Indicate starting screen for engine.  */
-  /* TODO: Enter engine loop.  */
+  /* Initialize engine.  */
+  engine.initialize("Prince of the Rationality", PIXI, document, window);
+  // TODO: loading screen.
+
+  engine.preload([]);
+
+  // TODO: Initial state and initial screen.
+
+  /* Enter engine loop.  */
+  engine.loop();
 }
 
 function initialize(PIXI, requestAnimFrame, document, window) {
