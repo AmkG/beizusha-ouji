@@ -104,9 +104,15 @@ function Engine() {
   this._name = "";
 
   this._loadingScreen = defaultLoadingScreen;
+
+  /* Screen state.  */
+  this._toLoad = [];
   this._screen = "";
   this._state = {};
-  this._toLoad = [];
+  this._screenTable = new Table();
+  /* Used when updating the screen.  */
+  this._screenChanged = false;
+  this._targetScreen = "";
 
   /* API objects.  */
   this._api = null; /* Limited API.  */
@@ -118,10 +124,6 @@ function Engine() {
 
   /* Engine state.  */
   this._engineState = "uninitialized";
-  /* True if the current screen has been entered.  */
-  this._initializedScreen = false;
-
-  this._screenTable = new Table();
 
   /* PIXI objects.  */
   this._renderer    = null; // The renderer.
@@ -196,55 +198,28 @@ function launchStateSaving(self) {
   }
   setImmediate(core);
 }
-function enterScreen(self) {
-  /* Launches the screen enter function.  */
-  var screenDef = self._screenTable.get(self._screen);
-  if (screenDef.enter) {
-    screenDef.enter(self._api);
-  }
-  self._initializedScreen = true;
-  self._engineState = "running";
-  self._offlineStore.access(function (storage) {
-    storage.setItem("screen", self._screen);
-    storage.setItem("state", JSON.stringify(self._state));
-  });
-}
-function launchScreenLoading(self) {
-  function core() {
-    if (self._toLoad.length > 0) {
-      var screen = self._toLoad.shift();
-      require([screen], function (screenDef) {
+function loadStep(self) {
+  /* Performs a step in loading.  */
+  if (self._toLoad.length != 0) {
+    var screen = self._toLoad.shift();
+    require([screen], function (screenDef) {
+      if (screenDef.assets) {
+        var loader = new PIXI.AssetLoader(screenDefs.assets);
+        loader.onComplete = function () {
+          self._screenTable.set(screen, screenDef);
+        };
+        loader.load();
+      } else {
         self._screenTable.set(screen, screenDef);
-        if (screenDef.assets) {
-          var loader = new PIXI.AssetLoader(screenDef.assets);
-          loader.onComplete = core;
-          loader.load();
-        } else {
-          setImmediate(core);
-        }
-      });
-    } else {
-      enterScreen(self);
-    }
+      }
+    });
   }
-  self._engineState = "loading";
-  setImmediate(core);
 }
 function setScreen(self, screen) {
-  if (self._initializedScreen) {
-    var screenDef = self._screenTable.get(self._screen);
-    if (screenDef.leave) {
-      screenDef.leave(self._api);
-    }
-    self._initializedScreen = false;
-  }
-  self._screen = screen;
-  if (self._screenTable.has(screen)) {
-    enterScreen(self);
-  } else {
-    self._toLoad.push(screen);
-    launchScreenLoading(self);
-  }
+  /* Changes the screen.  */
+
+  this._screenChanged = true;
+  this._targetScreen = screen;
 }
 /* Actual loop implementation.  */
 Engine.prototype.loop = function() {
@@ -305,12 +280,46 @@ Engine.prototype.loop = function() {
 
   /* Game loop.  */
   function onUpdate() {
-    if (self._engineState === "loading") {
-      self._loadingScreen(self._api);
-    } else if (self._engineState === "running") {
-      var screenDef = self._screenTable.get(self._screen);
-      if (screenDef.update) {
-        screenDef.update(self._apiUpdate);
+    var flag = true;
+    while (flag) {
+      if (self._engineState === "loading") {
+        if (self._toLoad.length == 0 &&
+            self._screenTable.has(self._screen)) {
+          self._engineState = "running";
+          var screenDef = self._screenTable.get(self._screen);
+          if (screenDef.enter) {
+            screenDef.enter(self._api);
+          }
+        } else {
+          loadStep(self);
+          self._loadingScreen(self._api);
+          flag = false;
+        }
+      } else if (self._engineState === "running") {
+        var screenDef = self._screenTable.get(self._screen);
+        if (screenDef.update) {
+          screenDef.update(self._apiUpdate);
+        }
+        if (self._screenChanged) {
+          if (screenDef.leave) {
+            screenDef.leave(self._api);
+          }
+          self._screenChanged = false;
+          self._screen = self._targetScreen;
+          if (self._screenTable.has(self._targetScreen)) {
+            /* No need to enter loading state.  */
+            screenDef = self._screenTable.get(self._targetScreen);
+            if (screenDef.enter) {
+              screenDef.enter(self._api);
+            }
+          } else {
+            /* Enter loading state.  */
+            self._toLoad.push(self._screen);
+            self._engineState = "loading";
+          }
+        } else {
+          flag = false;
+        }
       }
     }
     requestAnimFrame(render);
@@ -332,7 +341,11 @@ Engine.prototype.loop = function() {
     return {screen: screen, state: state};
   }).then(function (result) {
     self._state = result.state;
-    setScreen(self, result.screen);
+    self._screen = result.screen;
+    self._toLoad.push(self._screen);
+
+    self._api.state = self._state;
+    self._apiUpdate.state = self._state;
 
     // Launch the game state saving "thread".
     launchStateSaving(self);
