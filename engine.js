@@ -127,6 +127,7 @@ Engine.prototype.initialize = function (name) {
   }
 
   this._name = name;
+  document.title = name;
 
   this._engineState = "initialized";
 
@@ -190,6 +191,8 @@ Engine.prototype.loop = function() {
   document.body.appendChild(canvas);
   canvas.style.display  = "block";
   canvas.style.position = "absolute";
+
+  document.body.style.backgroundColor = 'gray';
 
   this._stage = new PIXI.Stage(0x000000);
   this._top = new PIXI.DisplayObjectContainer();
