@@ -28,7 +28,8 @@
 define(['pixi', 'ui/genericMenu'], function(PIXI, genericMenu) {
 "use strict";
 
-var progressStep = 0.025;
+var fadeinStep = 0.025;
+var fadeoutStep = 0.09;
 var maxBlurX = 2.0;
 var maxBlurY = 15.0;
 
@@ -45,10 +46,17 @@ engTitle.position.x = 640 - engTitle.width - 10;
 
 var progress = 0.0;
 
-function setByProgress() {
+function fadeinProgress() {
   blurFilter.blurX = progress * maxBlurX;
   blurFilter.blurY = progress * maxBlurY;
   title.alpha = 1.0 - (progress / 3);
+  engTitle.alpha = progress;
+  engTitle.position.x = 640 - engTitle.width - (32 * Math.sqrt(progress));
+}
+function fadeoutProgress() {
+  blurFilter.blurX = progress * maxBlurX;
+  blurFilter.blurY = progress * maxBlurY;
+  title.alpha = (progress * 2 / 3);
   engTitle.alpha = progress;
   engTitle.position.x = 640 - engTitle.width - (32 * Math.sqrt(progress));
 }
@@ -56,6 +64,8 @@ function setByProgress() {
 var actualMenu = new genericMenu.Class({
   items: ["Tutorial", "Play Game", "Credits"]
 });
+
+var state = "fadein";
 
 var mainMenu = {};
 mainMenu.assets = [
@@ -75,24 +85,38 @@ mainMenu.enter = function(api) {
   api.top.addChild(engTitle);
 
   progress = 0.0;
-  setByProgress();
+  fadeinProgress();
+  state = "fadein";
 
   api.stage.setBackgroundColor(0xFFFFFF);
 
-  actualMenu.enter(api);
 };
+var sel;
 mainMenu.update = function(api) {
-  var sel;
-  if (progress < 1.0) {
-    progress += progressStep;
+  if (state === "fadein") {
+    progress += fadeinStep;
     if (progress >= 1.0) {
       progress = 1.0;
+      state = "menuEnter";
     }
-    setByProgress();
-  }
-  sel = actualMenu.update(api);
-  if (sel >= 0) {
-    console.log("mainMenu.update: got sel:" + sel);
+    fadeinProgress();
+  } else if (state === "menuEnter") {
+    actualMenu.enter(api);
+    state = "select";
+  } else if (state === "select") {
+    sel = actualMenu.update(api);
+    if (sel >= 0) {
+      state = "fadeout";
+      actualMenu.leave(api);
+    }
+  } else if (state === "fadeout") {
+    progress -= fadeoutStep;
+    if (progress <= 0.0) {
+      progress = 0.0;
+      state = "end";
+    }
+    fadeoutProgress();
+  } else {
     switch(sel) {
       case 0: api.setScreen("screen/tutorial"); break;
       case 1: api.setScreen("screen/playGame"); break;
@@ -101,7 +125,7 @@ mainMenu.update = function(api) {
   }
 };
 mainMenu.leave = function(api) {
-  actualMenu.leave(api);
+  api.top.removeChildren();
 };
 
 return mainMenu;
