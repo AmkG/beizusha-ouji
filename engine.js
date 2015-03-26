@@ -26,8 +26,8 @@
  *
  */
 
-define(["util/Table", "util/OfflineStorage", "pixi"],
-function(Table      , OfflineStorage       ,  PIXI) {
+define(["util/Table", "util/OfflineStorage", "pixi", "engine/input"],
+function(Table      , OfflineStorage       ,  PIXI , input) {
 
 /*
 engine.initialize("game name");
@@ -263,6 +263,9 @@ Engine.prototype.loop = function() {
   window.addEventListener('resize', resize, false);
   resize();
 
+  /* Initialize the input.  */
+  input.initialize();
+
   /* Setup API.  */
   this._api = {
     stage: this._stage,
@@ -275,12 +278,16 @@ Engine.prototype.loop = function() {
     state: this._state,
     setScreen: function (screen) {
       setScreen(self, screen);
-    }
+    },
+    input: input
   };
 
   /* Game loop.  */
   function onUpdate() {
     var flag = true;
+
+    input.update();
+
     while (flag) {
       if (self._engineState === "loading") {
         if (self._toLoad.length == 0 &&
