@@ -115,7 +115,7 @@ function onkeyup(e) {
     if (e.keyCode === 32 || e.charCode === 32 ||
         e.keyCode === 13 || e.charCode === 13 ||
         e.keyCode === 10 || e.charCode === 10) {
-        keys.fire = false;
+        keys.enter = false;
     } else if (e.keyCode === 27 || e.charCode === 27) {
         keys.esc = false;
     }
