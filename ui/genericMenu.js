@@ -87,7 +87,8 @@ var menuVertPadding = 20;
 var itemPadding = 5;
 
 var fadeInStep = 0.05;
-var fedeOutStep = 0.09;
+var blinkingStep = 0.095;
+var fadeOutStep = 0.11;
 
 // Converts a numeric RGB value to a "#000000" equivalent.
 var hexes = [ '0', '1', '2', '3', '4', '5', '6', '7'
@@ -284,6 +285,7 @@ function select(self, i) {
   self._itemSelectTexts[i].visible = true;
 }
 Class.prototype.update = function (api) {
+  var nsel;
   if (this._state === "fadein") {
     this._progress += fadeInStep;
     if (this._progress >= 1.0) {
@@ -296,13 +298,42 @@ Class.prototype.update = function (api) {
     }
     return -1;
   } else if (this._state === "selecting") {
-    // TODO.
+    if (api.input.up) {
+      nsel = this._sel - 1;
+      if (nsel < 0) nsel = this._itemTexts.length - 1;
+      select(this, nsel);
+    } else if (api.input.down) {
+      nsel = this._sel + 1;
+      if (nsel >= this._itemTexts.length) nsel = 0;
+      select(this, nsel);
+    } else if (api.input.enter) {
+      this._state = "blinking";
+      this._progress = 0.0;
+    }
     return -1;
   } else if (this._state === "blinking") {
-    // TODO.
+    this._progress += blinkingStep;
+    if (this._progress < 0.16 ||
+        (0.33 < this._progress && this._progress < 0.5) ||
+        (0.66 < this._progress && this._progress < 0.83)) {
+      this._selector.visible = false;
+    } else {
+      this._selector.visible = true;
+    }
+    if (this._progress >= 1.0) {
+      this._state = "fadeout";
+      this._progress = 0.0;
+    }
     return -1;
   } else if (this._state === "fadeout") {
-    // TODO.
+    this._progress += fadeOutStep;
+    if (this._progress >= 1.0) {
+      this._menuTop.parent.removeChild(this._menuTop);
+      this._progress = 0.0;
+      this._state = "finish";
+    } else {
+      this._menuTop.alpha = 1.0 - this._progress;
+    }
     return -1;
   } else {
     return this._sel;
@@ -312,6 +343,7 @@ Class.prototype.leave = function (api) {
   if (this._menuTop.parent) {
     this._menuTop.parent.removeChild(this._menuTop);
   }
+  this._state = "fadein";
   return this;
 };
 
