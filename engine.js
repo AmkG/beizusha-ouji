@@ -113,6 +113,9 @@ function Engine() {
   /* Used when updating the screen.  */
   this._screenChanged = false;
   this._targetScreen = "";
+  /* Used when indicating that the state should get
+     saved.  */
+  this._saveNow = false;
 
   /* API objects.  */
   this._api = null; /* Limited API.  */
@@ -186,17 +189,25 @@ Engine.prototype.initialState = function(state) {
 };
 /* Private functions used by Engine.prototype.loop.  */
 function launchStateSaving(self) {
-  /* Saves the state of the game engine to offline storage.  */
+  /* Saves the state of the game engine to offline storage
+     every few seconds.  */
 
   function core() {
     self._offlineStore.access(function (storage) {
       storage.setItem("screen", self._screen);
       storage.setItem("state", JSON.stringify(self._state));
     }).then(function (result) {
-      setTimeout(core, 3400);
+      setTimeout(core, 5000);
     });
   }
   setImmediate(core);
+}
+function saveState(self) {
+  /* Saves the state of the game engine.  */
+  self._offlineStore.access(function (storage) {
+    storage.setItem("screen", self._screen);
+    storage.setItem("state", JSON.stringify(self._state));
+  });
 }
 function loadStep(self) {
   /* Performs a step in loading.  */
@@ -278,6 +289,11 @@ Engine.prototype.loop = function() {
     state: this._state,
     setScreen: function (screen) {
       setScreen(self, screen);
+      return this;
+    },
+    saveState: function () {
+      self._saveNow = true;
+      return this;
     },
     input: input
   };
@@ -313,6 +329,10 @@ Engine.prototype.loop = function() {
           }
           self._screenChanged = false;
           self._screen = self._targetScreen;
+
+          // Indicate the need to save.
+          self._saveNow = true;
+
           if (self._screenTable.has(self._targetScreen)) {
             /* No need to enter loading state.  */
             screenDef = self._screenTable.get(self._targetScreen);
@@ -328,6 +348,10 @@ Engine.prototype.loop = function() {
           flag = false;
         }
       }
+    }
+    if (self._saveNow) {
+      self._saveNow = false;
+      saveState(self);
     }
     requestAnimFrame(render);
   }
