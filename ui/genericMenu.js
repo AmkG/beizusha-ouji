@@ -86,9 +86,9 @@ var menuSidePadding = 20;
 var menuVertPadding = 20;
 var itemPadding = 5;
 
-var fadeInStep = 0.05;
-var blinkingStep = 0.095;
-var fadeOutStep = 0.11;
+var fadeInStep = 0.09;
+var blinkingStep = 0.105;
+var fadeOutStep = 0.15;
 
 // Converts a numeric RGB value to a "#000000" equivalent.
 var hexes = [ '0', '1', '2', '3', '4', '5', '6', '7'
