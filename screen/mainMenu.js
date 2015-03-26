@@ -25,7 +25,7 @@
  * for the JavaScript code in this page.
  *
  */
-define(['pixi'], function(PIXI) {
+define(['pixi', 'ui/genericMenu'], function(PIXI, genericMenu) {
 "use strict";
 
 var progressStep = 0.025;
@@ -53,6 +53,10 @@ function setByProgress() {
   engTitle.position.x = 640 - engTitle.width - (32 * Math.sqrt(progress));
 }
 
+var actualMenu = new genericMenu.Class({
+  items: ["Tutorial", "Play Game", "Credits"]
+});
+
 var mainMenu = {};
 mainMenu.assets = [
   "img/title.png"
@@ -74,8 +78,11 @@ mainMenu.enter = function(api) {
   setByProgress();
 
   api.stage.setBackgroundColor(0xFFFFFF);
+
+  actualMenu.enter(api);
 };
 mainMenu.update = function(api) {
+  var sel;
   if (progress < 1.0) {
     progress += progressStep;
     if (progress >= 1.0) {
@@ -83,6 +90,10 @@ mainMenu.update = function(api) {
     }
     setByProgress();
   }
+  sel = actualMenu.update(api);
+};
+mainMenu.leave = function(api) {
+  actualMenu.leave(api);
 };
 
 return mainMenu;
