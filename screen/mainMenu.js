@@ -91,6 +91,14 @@ mainMenu.update = function(api) {
     setByProgress();
   }
   sel = actualMenu.update(api);
+  if (sel >= 0) {
+    console.log("mainMenu.update: got sel:" + sel);
+    switch(sel) {
+      case 0: api.setScreen("screen/tutorial"); break;
+      case 1: api.setScreen("screen/playGame"); break;
+      case 2: api.setScreen("screen/credits"); break;
+    }
+  }
 };
 mainMenu.leave = function(api) {
   actualMenu.leave(api);
