@@ -203,7 +203,7 @@ function loadStep(self) {
   if (self._toLoad.length != 0) {
     var screen = self._toLoad.shift();
     require([screen], function (screenDef) {
-      if (screenDef.assets) {
+      if (screenDef.assets && screenDef.assets.length) {
         var loader = new PIXI.AssetLoader(screenDef.assets);
         loader.onComplete = function () {
           self._screenTable.set(screen, screenDef);
@@ -218,8 +218,8 @@ function loadStep(self) {
 function setScreen(self, screen) {
   /* Changes the screen.  */
 
-  this._screenChanged = true;
-  this._targetScreen = screen;
+  self._screenChanged = true;
+  self._targetScreen = screen;
 }
 /* Actual loop implementation.  */
 Engine.prototype.loop = function() {
