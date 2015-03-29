@@ -175,7 +175,8 @@ screen.enter = function (api) {
 
 screen.update = function (api) {
   var state = api.state;
-  if (api.input.esc || api.input.enter) {
+  if (api.input.esc ||
+      (api.input.enter && state.creditsPageNo === pages.length - 1)) {
     api.setScreen("screen/mainMenu");
     return;
   }
@@ -210,7 +211,7 @@ screen.update = function (api) {
     dir = -1;
     return;
   }
-  if (api.input.right) {
+  if (api.input.right || api.input.enter) {
     if (state.creditsPageNo === pages.length - 1) return;
     transitioning = true;
     progress = 0.0;
