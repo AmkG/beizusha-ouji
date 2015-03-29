@@ -56,6 +56,7 @@ function initiateMovement(dnum) {
         ss[i].pixiObj().x = 0      + 32 * dir.x + p * 32 * dir.xP;
       },
       finish: function () {
+        if (i != ss.length - 1) return;
         var ndnum = dnum + 1;
         if (ndnum >= dirs.length) {
           ndnum = 0;
