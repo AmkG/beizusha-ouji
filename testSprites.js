@@ -76,6 +76,7 @@ screen.assets =
   , 'img/priestess.png'
   , 'img/elvenarcher.png'
   , 'img/sidekick.png'
+  , 'img/oldprior.png'
   ];
 screen.enter = function (api) {
   var i;
