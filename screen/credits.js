@@ -40,11 +40,10 @@ var programmerPage =
       , {size: "small", text: "Program source code Copyright 2015 Alan Manuel K. Gloria"}
       ]
   };
-var charArtistPage =
-  { name: "Character Art"
+var lpcSSPage =
+  { name: "Character Art - Universal LPC Sprite Sheet"
   , lines:
-    [ {size: "big", text: "Universal LPC Spritesheet"}
-    , {size: "normal", text: "Matthew Krohn"}
+    [ {size: "normal", text: "Matthew Krohn"}
     , {size: "normal", text: "Luke Mehl"}
     , {size: "normal", text: "Johannes Sjölund"}
     , {size: "normal", text: "Marcel van de Steeg"}
@@ -61,13 +60,22 @@ var charArtistPage =
     , {size: "normal", text: "JaidynReiman"}
     , {size: "normal", text: "Nila122"}
     , {size: "normal", text: "neo4cat6"}
-    , {size: "big", text: "Char Generator based on Universal LPC Spritesheet"}
-    , {size: "normal", text: "Gaurav Munjal"}
-    , {size: "small", text: " "}
-    , {size: "small", text: "Liberated Pixel Cup was an event hosted by OpenGameArt.org"}
-    , {size: "small", text: "LPC Assets are licensed under CC-BY-SA 3.0 and GPLv3"}
+    , {size: "small", text: "OpenGameArt.org's Liberated Pixel Cup (LPC) Assets are licensed under CC-BY-SA 3.0 and GPLv3"}
     ]
   };
+var lpcCGPage =
+  { name: "Character Art - Character Generator"
+  , lines:
+    [ {size: "big", text: "Universal LPC Sprite Sheet Character Generator"}
+    , {size: "normal", text: "Gaurav Munjal"}
+    ]
+  };
+
+var pages =
+  [ programmerPage
+  , lpcSSPage
+  , lpcCGPage
+  ];
 
 /* Accepts a page object and creates a PIXI display object
    containing the page's contents.  */
@@ -99,9 +107,9 @@ function makeCreditPage(page, number, total) {
     line = lines[i];
     switch (line.size) {
       case "big":    font = "bold 28px sans-serif"; break;
-      case "small":  font = "14px serif"; break;
+      case "small":  font = "16px serif"; break;
       case "normal":
-      default:       font = "18px serif"; break;
+      default:       font = "22px serif"; break;
     }
     if (line.size === "big") y += 4;
     txt = new PIXI.Text(line.text, {
@@ -133,10 +141,6 @@ function makeCreditPage(page, number, total) {
   return pageTop;
 }
 
-var pages =
-  [ programmerPage
-  , charArtistPage
-  ];
 
 var pixiPages =
 (function () {
