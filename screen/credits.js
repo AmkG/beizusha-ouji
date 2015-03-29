@@ -159,7 +159,6 @@ var screen = {};
 screen.enter = function (api) {
   /* Update state.  */
   var state = api.state;
-  console.log(JSON.stringify(state));
   if (typeof state.creditsPageNo === "undefined") {
     state.creditsPageNo = 0;
   }
@@ -196,7 +195,6 @@ screen.update = function (api) {
       newPage.x = 0;
       state.creditsPageNo += dir;
       api.saveState();
-      console.log(JSON.stringify(state));
     } else {
       oldPage.alpha = 1 - progress;
       oldPage.x = (-dir * 640) * progress;
