@@ -44,7 +44,7 @@ engine.loadingScreen({
 - Define the loading screen.
 - The loading screen is displayed whenever a screen and its
   assets are being loaded.
-- API: TBD.
+- API: See the "screen" API below.
 
 engine.preload(["screen", "screen2"]);
 - Add the listed screens to the initial loading.
@@ -61,6 +61,120 @@ engine.initialState({});
 
 engine.loop();
 - Starts the engine's main loop.
+*/
+
+/*
+Screen API.
+
+Screens are Javascript objects.  In the game engine, screens are
+selected by name; that name should be loadable by RequireJS.
+
+Screens may optionally provide the following slots:
+
+screen.assets = ['img/whatever.png'];
+- The .assets slot, if present, should be an array of strings.
+  The strings are names (paths to) assets, loadable by
+  PIXI.AssetsLoader.
+- The loading screen's .assets slot is *IGNORED*.  That's because
+  the loading screen is displayed while assets are being loaded,
+  but screens cannot be displayed until their assets are loaded,
+  so if the loading screen has assets itself, then we're in a
+  chicken-and-egg situation.  To avoid this, the loading screen's
+  .assets are ignored.  You should load the loading screen's
+  assets yourself before starting the game engine.
+
+screen.enter(api);
+- The .enter() method is called when the screen is entered.
+- The API is the "enter/leave" API below.
+
+screen.update(api);
+- The .update() method is called every 0.04 seconds (25 per
+  second).
+- The API is the "update" API below.
+
+screen.leave(api);
+- The .leave() method is called when the screen has indicated
+  that a new screen will be loaded.
+- Te API is the "enter/leave" API below.
+
+
+Enter/Leave API.
+
+The "enter/leave" API contains the following slots:
+
+api.stage
+- The PIXI.Stage object to be used during rendering.
+
+api.top
+- The actual top display object container to be used.
+- The engine scales this display object container to fit the
+  available window space.  Items within this api.top container
+  can use a 640x360 screen coordinates (or whatever resolution
+  was given in engine.setVirtualResolution()).
+
+api.state
+- The game state that gets saved on-disk.
+- The game engine tracks this object as well as the current
+  screen, and saves the state periodically.  If the game is
+  exited, the engine resumes the game at the current screen
+  and with the state recovered.
+- The game state must be serializable: no functions, just
+  plain data.  Basically: if it can be serialized by
+  JSON.stringify and recovered by JSON.parse, it will be
+  saved safely.
+
+
+Update API.
+
+The "update" API contains the "enter/leave" API slots, and also
+adds the following slots:
+
+api.setScreen('screenName');
+- Indicate a transition to a new screen to the engine.
+- The current screen's .leave() is called very soon after.
+- The target screen and its assets are loaded if necessary,
+  then the target screen's .enter() is called and the current
+  screen becomes the target screen.
+  
+
+api.saveState();
+- Indicate to the engine that the state should be saved.
+- The engine will save the state every few seconds, but
+  you might want to save "important" state transitions.
+
+api.input
+- An object containing the current input state.
+- The engine only has four direction buttons and 2 action
+  buttons (enter and escape).
+
+api.input.x
+api.input.y
+- Numeric -1, 0, 1 values indicating the current direction
+  being pressed by the player.
+- x is -1 for left, 1 for right, 0 for neutral.
+- y is -1 for up, 1 for down, 0 for neutral.
+
+api.input.left
+api.input.right
+api.input.up
+api.input.down
+api.input.enter
+api.input.esc
+- Boolean flags indicating if the user tapped the
+  corresponding button.
+- The flags indicate only the initial keypress (i.e. from
+  "unpressed" to "pressed" state).  If the button is pressed
+  continuously, these flags remain false.
+
+api.input.leftState
+api.input.rightState
+api.input.upState
+api.input.downState
+api.input.enterState
+api.input.escState
+- Boolean flags indicating if the user currently has the
+  corresponding key pressed down.
+
 */
 
 var defaultLoadingScreen = {};
