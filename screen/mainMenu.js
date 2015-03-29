@@ -62,7 +62,7 @@ function fadeoutProgress() {
 }
 
 var actualMenu = new genericMenu.Class({
-  items: ["Tutorial", "Play Game", "Credits"]
+  items: ["Tutorial", "Play Game", "Credits", "Test Sprites"]
 });
 
 var state = "fadein";
@@ -121,6 +121,7 @@ mainMenu.update = function(api) {
       case 0: api.setScreen("screen/tutorial"); break;
       case 1: api.setScreen("screen/playGame"); break;
       case 2: api.setScreen("screen/credits"); break;
+      case 3: api.setScreen('testSprites'); break;
     }
   }
 };
