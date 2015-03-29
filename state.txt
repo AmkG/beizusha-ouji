@@ -1,0 +1,13 @@
+The main game state object is organized as follows:
+
+{ game:
+    [ { lastScreen: "screen/something"
+      ...
+      }
+    , { lastScreen: "screen/something"
+      ...
+      }
+    ]
+, gameNum: 0 // Which game is currently active.
+}
+
