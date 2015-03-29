@@ -28,9 +28,7 @@
 define(['pixi'], function(PIXI) {
 "use strict";
 
-/* The loading screen is somewhat different; it has enter,
-   leave, update, or assets.  It is composed only of a single
-   function, which is effectively, the update function.  */
+/* Loading screens don't have an assets field.  */
 
 var loadingText;
 
@@ -42,12 +40,12 @@ loadingText.position.y = 20;
 loadingText.scale.x = 0.5;
 loadingText.scale.y = 0.5;
 
-function loading(api) {
-  if (!loadingText.parent) {
-    api.top.removeChildren();
-    api.top.addChild(loadingText);
-    api.stage.setBackgroundColor(0xffffff);
-  }
+var loading = {};
+
+loading.enter = function (api) {
+  api.top.removeChildren();
+  api.top.addChild(loadingText);
+  api.stage.setBackgroundColor(0xffffff);
 }
 
 return loading;

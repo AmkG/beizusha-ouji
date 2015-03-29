@@ -36,8 +36,10 @@ engine.initialize("game name");
 engine.setVirtualResolution(640, 360);
 - Set the virtual resolution of the game engine.
 
-engine.loadingScreen(function (api) {
-  // ...
+engine.loadingScreen({
+  enter: function (api) {...},
+  update: function (api) {...},
+  leave: function (api) {...}
 });
 - Define the loading screen.
 - The loading screen is displayed whenever a screen and its
@@ -61,8 +63,7 @@ engine.loop();
 - Starts the engine's main loop.
 */
 
-function defaultLoadingScreen(api) {
-}
+var defaultLoadingScreen = {};
 
 function computeCanvasSize(vw, vh) {
   var w = window.innerWidth ||
@@ -159,8 +160,8 @@ Engine.prototype.setVirtualResolution = function (vw, vh) {
 
   return this;
 };
-Engine.prototype.loadingScreen = function (f) {
-  this._loadingScreen = f;
+Engine.prototype.loadingScreen = function (o) {
+  this._loadingScreen = o;
   return this;
 };
 Engine.prototype.preload = function(array) {
@@ -241,8 +242,6 @@ Engine.prototype.loop = function() {
     throw new Error("engine: cannot start loop now.");
   }
 
-  this._engineState = "loading";
-
   /* Initialize the canvas to display.  */
   var canvasSize = computeCanvasSize(this._vw, this._vh);
   this._renderer = PIXI.autoDetectRecommendedRenderer(
@@ -308,6 +307,11 @@ Engine.prototype.loop = function() {
       if (self._engineState === "loading") {
         if (self._toLoad.length == 0 &&
             self._screenTable.has(self._screen)) {
+
+          if (self._loadingScreen.leave) {
+            self._loadingScreen.leave(self._api);
+          }
+
           self._engineState = "running";
           var screenDef = self._screenTable.get(self._screen);
           if (screenDef.enter) {
@@ -315,7 +319,9 @@ Engine.prototype.loop = function() {
           }
         } else {
           loadStep(self);
-          self._loadingScreen(self._api);
+          if (self._loadingScreen.update) {
+            self._loadingScreen.update(self._apiUpdate);
+          }
           flag = false;
         }
       } else if (self._engineState === "running") {
@@ -343,6 +349,9 @@ Engine.prototype.loop = function() {
             /* Enter loading state.  */
             self._toLoad.push(self._screen);
             self._engineState = "loading";
+            if (self._loadingScreen.enter) {
+              self._loadingScreen.enter(self._api);
+            }
           }
         } else {
           flag = false;
@@ -380,6 +389,11 @@ Engine.prototype.loop = function() {
 
     // Launch the game state saving "thread".
     launchStateSaving(self);
+    // Launch the loading screen.
+    if (self._loadingScreen.enter) {
+      self._loadingScreen.enter(self._api);
+    }
+    self._engineState = "loading"; 
     // Launch the loop.
     setInterval(onUpdate, 40);
   });
