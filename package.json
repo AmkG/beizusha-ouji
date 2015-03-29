@@ -1,0 +1,16 @@
+{
+
+  // node-webkit information
+  "main": "index.html",
+  "window": {
+    "title": "Prince of the Rationality",
+    "toolbar": false,
+    "fullscreen": true
+  },
+  "webkit": {
+    "page-cache": true
+  },
+  "name": "beizusha-ouji"
+
+  // TODO: normal package.json fields
+}

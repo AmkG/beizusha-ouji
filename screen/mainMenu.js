@@ -61,8 +61,50 @@ function fadeoutProgress() {
   engTitle.position.x = 640 - engTitle.width - (32 * Math.sqrt(progress));
 }
 
+var exiting = false;
+
+var menu =
+  [ { item: "Tutorial"
+    , action: function (api) { api.setScreen('screen/tutorial'); }
+    }
+  , { item: "Play Game"
+    , action: function (api) { api.setScreen('screen/playGame'); }
+    }
+  , { item: "Credits"
+    , action: function (api) { api.setScreen('screen/credits'); }
+    }
+  , { item: "Test Sprites"
+    , action: function (api) { api.setScreen('testSprites'); }
+    }
+  ];
+/* If process and process.exit exist, add an 'exit' entry.
+   This is primarily for node-webkit. */
+if (typeof process !== "undefined" &&
+    typeof process.exit === "function") {
+  menu.push(
+    { item: "Exit Game"
+    , action: function (api) {
+        exiting = true;
+        setTimeout(function () {
+          process.exit();
+        }, 500);
+      }
+    }
+  );
+}
+var menuItems = [];
+var menuActions = [];
+(function () {
+var i;
+for (i = 0; i < menu.length; ++i) {
+  menuItems.push(menu[i].item);
+  menuActions.push(menu[i].action);
+}
+})();
+
 var actualMenu = new genericMenu.Class({
-  items: ["Tutorial", "Play Game", "Credits", "Test Sprites"]
+  items: menuItems,
+  minWidth: 100
 });
 
 var state = "fadein";
@@ -87,6 +129,7 @@ mainMenu.enter = function(api) {
   progress = 0.0;
   fadeinProgress();
   state = "fadein";
+  exiting = false;
 
   api.stage.setBackgroundColor(0xFFFFFF);
 
@@ -117,11 +160,8 @@ mainMenu.update = function(api) {
     }
     fadeoutProgress();
   } else {
-    switch(sel) {
-      case 0: api.setScreen("screen/tutorial"); break;
-      case 1: api.setScreen("screen/playGame"); break;
-      case 2: api.setScreen("screen/credits"); break;
-      case 3: api.setScreen('testSprites'); break;
+    if (!exiting)  {
+      menuActions[sel](api);
     }
   }
 };

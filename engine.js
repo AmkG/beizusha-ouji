@@ -315,7 +315,7 @@ function launchStateSaving(self) {
       setTimeout(core, 5000);
     });
   }
-  setImmediate(core);
+  setTimeout(core, 0);
 }
 function saveState(self) {
   /* Saves the state of the game engine.  */

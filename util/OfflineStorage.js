@@ -62,6 +62,17 @@ have it return the values needed to be known, and the
 variables.
 */
 
+var mySetImmediate = (function () {
+if (typeof setImmediate === "function") {
+  return setImmediate;
+} else if (typeof global === "object" && global &&
+           typeof global.setImmediate === "function") {
+  return global.setImmediate;
+} else {
+  return function (f) { setTimeout(f, 0); };
+}
+})();
+
 /* Promises and their handling.  */
 function Promise() {
   this._then = function (a) {};
@@ -126,14 +137,14 @@ function runOfflineStorage(self) {
     while (self._toRun.length > 0) {
       var ar = self._toRun.shift();
       var rv = ar.access.call(null, new SynchronousStorage(self._table));
-      setImmediate(function() {
+      mySetImmediate(function() {
         ar.promise._commit(rv);
       });
     }
     self._running = false;
   }
   function handleErrorMode() {
-    setImmediate(runErrorMode);
+    mySetImmediate(runErrorMode);
   }
   function enterErrorMode() {
     self._errored = true;
@@ -174,14 +185,14 @@ function runOfflineStorage(self) {
         var rv = ar.access.call(null, new SynchronousStorage(self._table));
         var request = store.put(self._table, "OfflineStorage");
         request.onsuccess = function (e) {
-          setImmediate(function () {
+          mySetImmediate(function () {
             ar.promise._commit(rv);
           });
         };
         request.onerror = function(e) {
           // At this point, the value has been returned and
           // the local copy of the table updated.
-          setImmediate(function () {
+          mySetImmediate(function () {
             ar.promise._commit(rv);
           });
           enterErrorMode();
@@ -196,7 +207,7 @@ function runOfflineStorage(self) {
     }
   }
   function handleNormalCase() {
-    setImmediate(coreNormalRun);
+    mySetImmediate(coreNormalRun);
   }
 
   /* If database not open yet, open it.  */
