@@ -45,7 +45,8 @@ var dirs =
 /* Initiate movement in some direction.  */
 function initiateMovement(dnum) {
   var dir = dirs[dnum];
-  var i;
+  var i = 0;
+  var finished = ss.length;
 
   for (i = 0; i < ss.length; ++i) {
     (function (i) {
@@ -56,14 +57,13 @@ function initiateMovement(dnum) {
         ss[i].pixiObj().x = 0      + 32 * dir.x + p * 32 * dir.xP;
       },
       finish: function () {
-        if (i != ss.length - 1) return;
+        --finished;
+        if (finished != 0) return;
         var ndnum = dnum + 1;
         if (ndnum >= dirs.length) {
           ndnum = 0;
         }
-        setImmediate(function() {
-          initiateMovement(ndnum);
-        });
+        initiateMovement(ndnum);
       }
     });
     })(i);
