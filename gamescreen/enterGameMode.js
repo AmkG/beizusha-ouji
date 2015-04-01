@@ -1,4 +1,4 @@
-/* screen/playGame.js - Play Game menu entry.  */
+/* gamescreen/enterGameMode.js - Enters game mode.  */
 /**
  *
  * @licstart  The following is the entire license notice for the 
@@ -25,17 +25,33 @@
  * for the JavaScript code in this page.
  *
  */
-define(['gamescreen/enterGameMode'], function (enterGameMode) {
+define([], function () {
 "use strict";
+
+var mode = 'game';
 
 var screen = {};
 screen.update = function (api) {
-  /* Game slot 0 is reserved for tutorial.  */
-  api.state.gameNum = 1;
-  enterGameMode.setMode('game');
-  api.setScreen('gamescreen/enterGameMode');
+  if (api.state.game) {
+    if (api.state.game[api.state.gameNum]) {
+      if (typeof api.state.game[api.state.gameNum].lastScreen == 'string') {
+        api.setScreen(api.state.game[api.state.gameNum].lastScreen);
+        return;
+      }
+    }
+  }
+  if (mode === 'game') {
+    api.setScreen('gamescreen/initGame');
+  } else if (mode === 'tutorial') {
+    api.setScreen('gamescreen/initTutorial');
+  } else {
+    throw new Error('gamescreen/enterGameMode: Unknown mode: ' + mode);
+  }
+};
+screen.setMode = function (nmode) {
+  mode = nmode;
+  return this;
 };
 
 return screen;
 });
-
