@@ -77,10 +77,11 @@ allied('life', 'light');
 })();
 
 exports.areAllied = function(t1, t2) {
+  if (t1 == t2) return true;
   return !!alliedTb[mkAllyKey(t1, t2)];
 };
 exports.areOpposed = function(t1, t2) {
-  return !alliedTb[mkAllyKey(t1, t2)];
+  return !exports.areAllied(t1, t2);
 };
 
 /*-----------------------------------------------------------------------------
