@@ -121,6 +121,7 @@ are objects whose public slots are the following methods:
 - Given an object, add the object's element name slots to
   the character's resists.
 - A slot may be negative to indicate reduction of resistances.
+  Resistances may become negative.
 - Takes effect after the call to apply().
 - Only affects the current combat.
 
@@ -169,6 +170,19 @@ are objects whose public slots are the following methods:
 - Given a positiveo or zero number, reduces the character's
   speed by that amount.
 - The value is subtracted from the current speed.
+
+.attackDamage()
+- Return an object containing the damage of each type of the
+  character.
+- This takes into account all the equipment of a player
+  character.
+
+.changeAttackDamage(obj)
+- Modify the attack damage of the character.
+- The given object contains element name slots that numerically
+  modify the damage of the character.
+- Slots may be negative to reduce the damage.  Damage may not
+  be reduced to below 0.
 
 */
 
@@ -344,6 +358,43 @@ skills.prismatic =
 }
 };
 
+var two_over_pi = 2 / Math.PI;
+
+skills.protection =
+{ name: "Protective Brilliance"
+, desc: "A lengthy spell that bathes your allies in a " +
+        "warding Light."
+, element: 'light'
+, charClass: 'mage'
+, target: 'allies'
+, turns: 1                      ///////
+, animation: 'spellcast'
+, onSkillbook: true
+, apply: function (caster, targets) {
+  var magic = caster.stats().magic;
+  if (caster.element() === 'light') {
+    magic *= 1.5;
+  }
+
+  // Use an asymptotic transfer function.
+  var maxBonus = 20;
+  var bonus = maxBonus * Math.atan(magic / 5) * two_over_pi;
+  var halfBonus = bonus / 2;
+
+  var resists =
+    { life: halfBonus
+    , normal: bonus
+    };
+
+  var i = 0;
+  var target = null;
+  for (i = 0; i < targets.length; ++i) {
+    target = targets[i];
+    target.changeResists(resists);
+  }
+}
+};
+
 /*-----------------------------------------------------------------------------
 Order
 -----------------------------------------------------------------------------*/
@@ -368,7 +419,7 @@ skills.justice =
     totalAttack += attack[el];
   }
   if (caster.element() == 'order') {
-    totalAttack *= 1.05;
+    totalAttack *= 1.1;
   }
   totalAttack *= 1.5;
   var dmg = element.computeDamage(target.resists(), {order: totalAttack});
@@ -378,8 +429,8 @@ skills.justice =
 }
 };
 
-skills.impositionoforder =
-{ name: "Imposition of Order"
+skills.impositionoflaw =
+{ name: "Imposition of Law"
 , desc: "Impose a slow down on all opponents."
 , element: 'order'
 , charClass: 'any'
@@ -402,7 +453,7 @@ skills.impositionoforder =
     target.slowDown(slow);
   }
 }
-}
+};
 
 /*-----------------------------------------------------------------------------
 Dark
@@ -487,7 +538,7 @@ skills.arrowofdeath =
   var dmg = element.computeDamage(target.resists(), {dark: totalDamage});
   target.dealDamage(dmg);
 
-  caster.slowDown(20);
+  caster.slowDown(10);
 }
 };
 
@@ -529,6 +580,27 @@ skills.berserk =
   }
 
   caster.speedUp(20);
+}
+};
+
+skills.frenzy =
+{ name: "Frenzy"
+, desc: "A slash attack that steadily makes you stronger and " +
+         "faster, but only deals Normal and Chaos damage."
+, element: 'chaos'
+, charClass: 'fighter'
+, target: 'enemy'
+, animation: 'slash'
+, onSkillbook: true
+, apply: function (caster, target) {
+  var baseAttack = meleeAttack(caster);
+  var attack = { normal: baseAttack.normal
+               , chaos: baseAttack.chaos
+               };
+  var dmg = element.computeDamage(target.resists(), attack);
+  target.dealDamage(dmg);
+  caster.speedUp(5);
+  caster.changeAttackDamage({chaos: 1, normal: 1});
 }
 };
 
@@ -588,7 +660,7 @@ skills.multishoot =
     el = element.types[i];
     if (!attack[el]) continue;
     if (el === 'chaos') continue;
-    attack[el] *= 0.25;
+    attack[el] *= 0.2;
   }
   var target = null;
   for (i = 0; i < targets.length; ++i) {
@@ -629,7 +701,7 @@ skills.drain =
 , desc: "Deal Life damage magically to an opponent, and heal " +
         "yourself."
 , element: 'life'
-, charClass: 'any'
+, charClass: 'mage'
 , target: 'enemy'
 , animation: 'spellcast'
 , onSkillbook: true
@@ -646,6 +718,42 @@ skills.drain =
 }
 };
 
+skills.growth =
+{ name: "Grow"
+, desc: "Increase your toughness, damage, and magic."
+, element: 'life'
+, charClass: 'any'
+, target: 'self'
+, animation: 'spellcast'
+, singleUse: true
+, onScroll: true
+, onSkillbook: true
+, apply: function (caster, target) {
+  var resists = target.resists();
+  var attack = target.attackDamage();
+  var normalRes = resists.normal;
+  var lifeRes = resists.life;
+  var normalA = attack.normal;
+  var lifeA = attack.life;
+  var deltaNormalR = normalRes * 0.5;
+  var deltaLifeR = lifeRes * 0.75;
+  var deltaNormalA = normalA * 0.3;
+  var deltaLifeA = lifeA * 0.5;
+  var deltaMagic = 8;
+
+  if (target.element() === 'life') {
+    deltaNormalR *= 1.1;
+    deltaLifeR *= 1.1;
+    deltaNormalA *= 1.1;
+    deltaLifeA *= 1.1;
+    deltaMagic *= 1.1;
+  }
+
+  target.changeResists({normal:deltaNormalR, life:deltaLifeR});
+  target.changeAttackDamage({normal:deltaNormalA, life:deltaLifeA});
+  target.changeStats({magic: deltaMagic});
+}
+};
 
 return skills;
 });
