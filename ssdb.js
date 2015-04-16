@@ -53,6 +53,7 @@ var tb = new Table();
 
 function withAsset(assets, obj) {
   obj.assets = assets;
+  return obj;
 }
 function fromFullSheet(asset) {
   return withAsset([asset], new FullSheet(asset));
@@ -67,7 +68,7 @@ Main Characters
 
 tb.set('prince',       fromFullSheet('img/prince.png'));
 tb.set('priestess',    fromFullSheet('img/priestess.png'));
-tb.set('elvenarcher',  fromFullSheet('img/elvenprincess.png'));
+tb.set('elvenarcher',  fromFullSheet('img/elvenarcher.png'));
 tb.set('sidekick',     fromFullSheet('img/sidekick.png'));
 tb.set('oldprior',     fromFullSheet('img/oldprior.png'));
 
