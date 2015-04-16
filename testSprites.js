@@ -25,8 +25,8 @@
  * for the JavaScript code in this page.
  *
  */
-define(['spritesheet'],
-function(spritesheet) {
+define(['ssdb'],
+function(ssdb) {
 
 // Array of spritesheets.
 // Will be filled in when first entered.
@@ -70,14 +70,22 @@ function initiateMovement(dnum) {
   }
 }
 
-var screen = {};
-screen.assets =
-  [ 'img/prince.png'
-  , 'img/priestess.png'
-  , 'img/elvenarcher.png'
-  , 'img/sidekick.png'
-  , 'img/oldprior.png'
+var chars =
+  [ 'prince'
+  , 'priestess'
+  , 'elvenarcher'
+  , 'sidekick'
+  , 'oldprior'
   ];
+
+var screen = {};
+screen.assets = [];
+(function () {
+for (var i = 0; i < chars.length; ++i) {
+  screen.assets = screen.assets.concat(ssdb.assets(chars[i]));
+}
+})();
+
 screen.enter = function (api) {
   var i;
 
@@ -85,8 +93,8 @@ screen.enter = function (api) {
   api.top.removeChildren();
   if (ss.length === 0) {
     // Generate the sheets.
-    for (i = 0; i < screen.assets.length; ++i) {
-      ss.push(new spritesheet.FullSheet(screen.assets[i]));
+    for (i = 0; i < chars.length; ++i) {
+      ss.push(ssdb(chars[i]));
     }
   }
   // Put the characters and position them.
