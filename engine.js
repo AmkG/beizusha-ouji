@@ -123,6 +123,9 @@ api.state
   JSON.stringify and recovered by JSON.parse, it will be
   saved safely.
 
+api.screen
+- The name of the current screen.
+
 
 Update API.
 
@@ -394,22 +397,21 @@ Engine.prototype.loop = function() {
   this._api = {
     stage: this._stage,
     top: this._top,
-    state: this._state
-  };
-  this._apiUpdate = {
-    stage: this._stage,
-    top: this._top,
     state: this._state,
-    setScreen: function (screen) {
+    screen: ''
+  };
+  this._apiUpdate = Object.create(this._api);
+  this._apiUpdate.setScreen =
+    function (screen) {
       setScreen(self, screen);
       return this;
-    },
-    saveState: function () {
+    };
+  this._apiUpdate.saveState =
+    function () {
       self._saveNow = true;
       return this;
-    },
-    input: input
-  };
+    };
+  this._apiUpdate.input = input;
 
   /* Game loop.  */
   function onUpdate() {
@@ -449,6 +451,7 @@ Engine.prototype.loop = function() {
           }
           self._screenChanged = false;
           self._screen = self._targetScreen;
+          self._api.screen = self._screen;
 
           // Indicate the need to save.
           self._saveNow = true;
@@ -497,6 +500,7 @@ Engine.prototype.loop = function() {
     self._state = result.state;
     self._screen = result.screen;
     self._toLoad.push(self._screen);
+    self._api.screen = self._screen;
 
     self._api.state = self._state;
     self._apiUpdate.state = self._state;
