@@ -39,7 +39,7 @@ screen.assets = // ...
 screen.enter = // ...
 screen.update = // ...
 
-return new GameScreen('gamescreen/myName', screen);
+return new GameScreen(screen);
 });
 
 Game screens are provided one additional slot in the api
@@ -63,20 +63,20 @@ function wrapAPI(api) {
   return rv;
 }
 
-function GameScreen(name, screen) {
+function GameScreen(screen) {
   var self = this || {};
   if (screen.assets) self.assets = screen.assets;
   if (screen.enter) {
     self.enter = function (api) {
       var gameAPI = wrapAPI(api);
-      gameAPI.lastScreen = name;
+      gameAPI.lastScreen = api.screen;
       screen.enter(gameAPI);
       return self;
     };
   } else {
     self.enter = function(api) {
       var gameAPI = wrapAPI(api);
-      gameAPI.lastScreen = name;
+      gameAPI.lastScreen = api.screen;
       return self;
     };
   }

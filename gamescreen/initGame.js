@@ -36,5 +36,5 @@ screen.leave = function (api) {
   base.leave(api);
 }
 
-return new GS('gamescreen/initGame', screen);
+return new GS(screen);
 });
