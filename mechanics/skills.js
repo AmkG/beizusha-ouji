@@ -70,14 +70,6 @@ otherwise, each slot is required.
 - If present and true, indicates that the skill can only
   be used once per combat.
 
-.turns
-- Optional.
-- A natural.
-- If present and non-zero, indicates that the skill consumes
-  more than one turn, and indicates the number of extra turns
-  to consume.
-- The skill is applied on its last turn.
-
 .animation
 - One of the following strings: 'slash', 'shoot', 'spellcast'.
 - Note that various character classes might not have useful
@@ -236,7 +228,6 @@ skills.slash =
 , charClass: 'fighter'
 , target: 'enemy'
 , singleUse: false
-, turns: 0
 , animation: 'slash'
 , onScroll: false
 , onSkillbook: false
@@ -254,7 +245,6 @@ skills.shoot =
 , charClass: 'archer'
 , target: 'enemy'
 , singleUse: false
-, turns: 0
 , animation: 'shoot'
 , onScroll: false
 , onSkillbook: false
@@ -362,12 +352,11 @@ var two_over_pi = 2 / Math.PI;
 
 skills.protection =
 { name: "Protective Brilliance"
-, desc: "A lengthy spell that bathes your allies in a " +
+, desc: "Bathe your allies in a " +
         "warding Light."
 , element: 'light'
 , charClass: 'mage'
 , target: 'allies'
-, turns: 1                      ///////
 , animation: 'spellcast'
 , onSkillbook: true
 , apply: function (caster, targets) {
@@ -377,7 +366,7 @@ skills.protection =
   }
 
   // Use an asymptotic transfer function.
-  var maxBonus = 20;
+  var maxBonus = 15;
   var bonus = maxBonus * Math.atan(magic / 5) * two_over_pi;
   var halfBonus = bonus / 2;
 
@@ -511,15 +500,13 @@ skills.blackblade =
 
 skills.arrowofdeath =
 { name: "Arrow of Death"
-, desc: "Focus into the Dark, keeping a single " +
-        "target in sight for long enough to shoot a powerful " +
-        "arrow of darkness, and slowing you down in combat " +
+, desc: "Shoot a powerful " +
+        "arrow of darkness, and slow yourself down in combat " +
         "afterwards."
 , element: 'dark'
 , charClass: 'archer'
 , target: 'enemy'
 , singleUse: true
-, turns: 1                      ///////
 , animation: 'shoot'
 , onSkillbook: true
 , apply: function (caster, target) {
@@ -533,12 +520,12 @@ skills.arrowofdeath =
     if (!attack[el]) continue;
     totalDamage += attack[el];
   }
-  totalDamage *= 2;
+  totalDamage *= 1.8;
 
   var dmg = element.computeDamage(target.resists(), {dark: totalDamage});
   target.dealDamage(dmg);
 
-  caster.slowDown(10);
+  caster.slowDown(15);
 }
 };
 
