@@ -66,11 +66,15 @@ function fromFullCycle(asset) {
 Main Characters
 -----------------------------------------------------------------------------*/
 
+/* Main 4.  */
 tb.set('prince',       fromFullSheet('img/prince.png'));
 tb.set('priestess',    fromFullSheet('img/priestess.png'));
 tb.set('elvenarcher',  fromFullSheet('img/elvenarcher.png'));
 tb.set('sidekick',     fromFullSheet('img/sidekick.png'));
+
+/* Other important characters.  */
 tb.set('oldprior',     fromFullSheet('img/oldprior.png'));
+tb.set('barbarian',    fromFullSheet('img/barbarian.png'));
 
 /*-----------------------------------------------------------------------------
 API
