@@ -135,8 +135,7 @@ exports.computeDamage = function (resists, attack) {
     }
 
     if (rval < 0.0) {
-      /* If negative resist, add it directly.  */
-      total += aval - rval;
+      total += aval - ((aval * rval) / (aval - rval));
     } else {
       total += aval * aval / (aval + rval);
     }
