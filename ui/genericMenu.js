@@ -343,7 +343,7 @@ Class.prototype.leave = function (api) {
   if (this._menuTop.parent) {
     this._menuTop.parent.removeChild(this._menuTop);
   }
-  this._state = "fadein";
+  this._state = "finish";
   return this;
 };
 
