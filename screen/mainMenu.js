@@ -77,10 +77,12 @@ var menu =
     , action: function (api) { api.setScreen('testSprites'); }
     }
   ];
+var menuEsc = -1;
 /* If process and process.exit exist, add an 'exit' entry.
    This is primarily for node-webkit. */
 if (typeof process !== "undefined" &&
     typeof process.exit === "function") {
+  menuEsc = menu.length;
   menu.push(
     { item: "Exit Game"
     , action: function (api) {
@@ -104,7 +106,8 @@ for (i = 0; i < menu.length; ++i) {
 
 var actualMenu = new genericMenu.Class({
   items: menuItems,
-  minWidth: 100
+  minWidth: 100,
+  esc: menuEsc
 });
 
 var state = "fadein";
