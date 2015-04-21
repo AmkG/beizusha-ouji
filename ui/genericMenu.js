@@ -90,6 +90,35 @@ menu.leave(api);
 - Removes the menu if it is still connected.
 */
 
+/*
+The genericMenu also supports an Async-type class.
+
+var amenu = new genericMenu.AsyncClass({
+ //...
+});
+- Create an asynchronous menu.
+- options argument is the same as genericMenu.Class.
+
+amenu.setItems(["Item 1"]);
+amenu.setEsc(-1);
+- The same as in genericMenu.Class.
+
+amenu.update(api);
+- Updates the menu.  The engine API for update must be
+  provided.
+- Returns the menu itself.
+
+amenu.getSelection(function (sel) {
+  // ...
+});
+- Display the menu, and wait for the user to select an
+  input.
+- The given continuation function is called when the user
+  has selected a menu.
+- The continuation function is called within the context
+  of the .update() method call.
+*/
+
 var menuSidePadding = 20;
 var menuVertPadding = 20;
 var itemPadding = 5;
@@ -107,6 +136,10 @@ function num2hex(rgb) {
   }
   return "#" + hex2(rgb >>> 16) + hex2(rgb >>> 8) + hex2(rgb);
 }
+
+/*-----------------------------------------------------------------------------
+Normal class
+-----------------------------------------------------------------------------*/
 
 function Class(options) {
   this._sbgcSet = false;
@@ -368,6 +401,49 @@ Class.prototype.leave = function (api) {
   return this;
 };
 
+/*-----------------------------------------------------------------------------
+Async Class
+-----------------------------------------------------------------------------*/
+
+function nullFun() { }
+
+function AsyncClass(options) {
+  this._core = new Class(options);
+  this._toEnter = false;
+  this._displayed = false;
+  this._callback = nullFun;
+}
+AsyncClass.prototype.setItems = function (items) {
+  this._core.setItems(items);
+  return this;
+};
+AsyncClass.prototype.setEsc = function (esc) {
+  this._core.setEsc(esc);
+  return this;
+};
+AsyncClass.prototype.update = function (api) {
+  if (this._toEnter) {
+    this._core.enter(api);
+    this._toEnter = false;
+  }
+  if (!this._displayed) return this;
+  var sel = this._core.update(api);
+  if (sel >= 0) {
+    this._displayed = false;
+    var toCall = this._callback;
+    this._callback = nullFun;
+    toCall(sel);
+  }
+  return this;
+};
+AsyncClass.prototype.getSelection = function (k) {
+  this._toEnter = true;
+  this._displayed = true;
+  this._callback = k;
+  return this;
+};
+
 return { Class      : Class
+       , AsyncClass : AsyncClass
        };
 });
