@@ -41,7 +41,8 @@ var menu = new genericMenu.Class({
   selectColor: 0x80C080,
   textColor: 0xFFFFFF,
   selectTextColor: 0xFFFFFF,
-  minWidth: 200
+  minWidth: 200,
+  esc: 2
 });
 - Construct a new menu.
 - stageBackgroundColor: the color to set as the stage background
@@ -60,6 +61,8 @@ var menu = new genericMenu.Class({
 - selectTextColor: the color of selected items.  Default
   0xFFFFFF.
 - minWidth: the minimum width of the menu.  Default 200.
+- esc: If non-negative, the selection to use if ESC is pressed.
+  Default -1.
 
 menu.setItems(["Item 1", "Item 2"]);
 - Sets the items.
@@ -136,6 +139,10 @@ function Class(options) {
   this._minWidth = 200;
   if (typeof options.minWidth !== "undefined") {
     this._minWidth = options.minWidth;
+  }
+  this._esc = -1;
+  if (typeof options.esc !== "undefined") {
+    this._esc = options.esc;
   }
 
   /* The PIXI.Text objects for each item.  */
@@ -307,6 +314,11 @@ Class.prototype.update = function (api) {
       if (nsel >= this._itemTexts.length) nsel = 0;
       select(this, nsel);
     } else if (api.input.enter) {
+      this._state = "blinking";
+      this._progress = 0.0;
+    } else if (api.input.esc &&
+               0 <= this._esc && this._esc < this._itemTexts.length) {
+      select(this, this._esc);
       this._state = "blinking";
       this._progress = 0.0;
     }
