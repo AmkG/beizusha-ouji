@@ -97,7 +97,7 @@ ssdb.assets = function (key) {
 ssdb.async = function (key, k) {
   if (tb.has(key)) {
     var assets = ssdb.assets(key);
-    var loader = newPIXI.AssetLoader(assets);
+    var loader = new PIXI.AssetLoader(assets);
     loader.onComplete = function () {
       k(ssdb(key));
     };
