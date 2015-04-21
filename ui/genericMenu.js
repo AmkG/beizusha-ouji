@@ -68,6 +68,11 @@ menu.setItems(["Item 1", "Item 2"]);
 - Sets the items.
 - NOTE!  Should not be used while the menu is displayed.
 
+menu.setEsc(1);
+- Sets the menu entry to be used if the user presses ESC.
+- Set to -1 if ESC is to be ignored.
+- NOTE!  Should not be used while the menu is displayed.
+
 menu.enter(api);
 - Enters the menu (displays the menu).
 - The API given should be the engine API for entry.
@@ -165,6 +170,10 @@ Class.prototype.setItems = function (items) {
   this._itemSelectTexts = [];
   this._menuTop = null;
   this._selector = null;
+  return this;
+};
+Class.prototype.setEsc = function (esc) {
+  this._esc = esc;
   return this;
 };
 Class.prototype.enter = function (api) {
