@@ -198,6 +198,9 @@ function CombatScreen(cfg) {
 
   // A slot for number of animations still pending.
   this._number = 0;
+
+  // Flag whether to call saveState or not.
+  this._saveState = false;
 }
 
 /*-----------------------------------------------------------------------------
@@ -221,29 +224,37 @@ function init(self) {
                  cs.enemies.length +
                  1 ;
   for (i = 0; i < 4; ++i) {
+    (function (i) {
     if (i < cs.players.length) {
-      (function (i) {
       var player = cs.players[i];
+      var life = player.life;
+      if (typeof player.nextTurn === 'undefined' &&
+          player.life > 0) {
+        // TODO: set a random next-turn.
+      }
       self._spritesheets(player.spritesheet, function (ss) {
         // TODO: show player view, install spritesheet.
         next();
       });
-      })(i);
     } else {
       // TODO: hide player view.
     }
 
     if (i < cs.enemies.length) {
-      (function (i) {
       var enemy = cs.enemies[i];
+      var life = enemy.life;
+      if (typeof enemy.nextTurn === 'undefined' &&
+          enemy.life > 0) {
+        // TODO: set a random next-turn.
+      }
       self._spritesheets(enemy.spritesheet, function (ss) {
         // TODO: show enemy view, install spritesheet.
         next();
       });
-      })(i);
     } else {
       // TODO: hide enemy view.
     }
+    })(i);
   }
 
   self._getready.show(next);
@@ -254,8 +265,6 @@ function reveal(self) {
     if (self._number !== 0) return;
     // TODO.
   }
-
-  // TODO: Set up spritesheet states.
 
   self._number = 2;
   self._curtain.fadeIn(next);
@@ -278,6 +287,10 @@ CombatScreen.prototype.enter = function (api) {
 CombatScreen.prototype.update = function (api) {
   this._cs = api.gameState.combat;
   this._allUpdate(api);
+  if (this._saveState) {
+    this._saveState = false;
+    api.saveState();
+  }
   return this;
 };
 CombatScreen.prototype.leave = function (api) {
