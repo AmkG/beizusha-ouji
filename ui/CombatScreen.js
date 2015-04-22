@@ -157,7 +157,7 @@ var PIXI = require('pixi');
 var UC = require('ui/UpdateContainer');
 var Curtain = require('ui/Curtain');
 
-var GR = require('ui/CombatScreen/GetReady');
+var GetReady = require('ui/CombatScreen/GetReady');
 
 function CombatScreen(cfg) {
   // Get configuration.
