@@ -306,12 +306,45 @@ function reveal(self) {
   function next() {
     --self._number;
     if (self._number !== 0) return;
-    // TODO.
+    judgeWinLose(self);
   }
 
+  // Two continuations, one for the curtain, one
+  // for fading out the GET READY!
   self._number = 2;
   self._curtain.fadeIn(next);
   self._getready.hide(next);
+}
+
+/* Main loop.  */
+function judgeWinLose(self) {
+  /* Determines if the player has already won or lost.  */
+
+  var cs = self._cs;
+  var i = 0;
+
+  var eLose = true;
+  var pLose = true;
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length) {
+      if (cs.players[i].life > 0) pLose = false;
+    }
+    if (i < cs.enemies.length) {
+      if (cs.enemies[i].life > 0) eLose = false;
+    }
+  }
+
+  if (pLose) {
+    // TODO.
+  } else if (eLose) {
+    // TODO.
+  } else {
+    advanceTime(self);
+  }
+}
+
+function advanceTime(self) {
+  /* Advances the time.  */
 }
 
 /*-----------------------------------------------------------------------------
