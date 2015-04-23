@@ -26,7 +26,7 @@
  * for the JavaScript code in this page.
  *
  */
-define(['pixi'], function (PIXI) {
+define(['pixi', 'ui/CombatScreen/speed'], function (PIXI, slib) {
 "use strict";
 
 /*
@@ -108,15 +108,8 @@ var timePixels              = 0.5;
 
 function nullFun() {}
 
-/* Compute time-between-turns from the given speed.  */
-function timeFromSpeed(speed) {
-  if (speed === 0.0) return 100.0;
-  if (speed < 0.0) {
-    return 100.0 - speed;
-  } else {
-    return 10000.0 / (speed + 100.0);
-  }
-}
+var timeFromSpeed = slib.timeFromSpeed;
+var changeNextTurn = slib.changeNextTurn;
 
 function Timeline() {
   // Core settings.
@@ -222,12 +215,10 @@ Timeline.prototype.animateChange = function (dS, dN, k) {
     // A change in speed also implies a change in
     // next-turn.  Compute an additional change in
     // next-turn.
-    var curspeed = this._speed;
-    var newspeed = this._speed + dS;
-    var curtime = timeFromSpeed(curspeed);
-    var newtime = timeFromSpeed(newspeed);
-    var curnt = this._nextTurn;
-    var newnt = curnt * newtime / curtime;
+    var newnt = changeNextTurn( this._nextTurn
+                              , this._speed
+                              , this._speed + dS
+                              );
     var changent = newnt - curnt;
     dN += changent;
   }
