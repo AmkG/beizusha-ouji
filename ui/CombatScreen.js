@@ -219,6 +219,9 @@ function CombatScreen(cfg) {
 
   // Flag whether to call saveState or not.
   this._saveState = false;
+
+  // Slot for holding screen to go to.
+  this._goto = '';
 }
 
 /*-----------------------------------------------------------------------------
@@ -335,9 +338,9 @@ function judgeWinLose(self) {
   }
 
   if (pLose) {
-    // TODO.
+    this._goto = this._onLose;
   } else if (eLose) {
-    // TODO.
+    this._goto = this._onWin;
   } else {
     advanceTime(self);
   }
@@ -356,6 +359,8 @@ CombatScreen.prototype.enter = function (api) {
 
   api.top.addChild(this._pixi);
 
+  this._goto = '';
+
   init(this);
 
   return this;
@@ -366,6 +371,11 @@ CombatScreen.prototype.update = function (api) {
   if (this._saveState) {
     this._saveState = false;
     api.saveState();
+  }
+  if (this._goto !== '') {
+    var dest = this._goto;
+    this._goto = '';
+    api.setScreen(dest);
   }
   return this;
 };
