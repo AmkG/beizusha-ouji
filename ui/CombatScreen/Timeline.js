@@ -188,7 +188,7 @@ Timeline.prototype.getSpeed = function () {
   return this._speed;
 };
 Timeline.prototype.getNextTurn = function () {
-  return this._nextTurn;
+  return this._next;
 };
 Timeline.prototype.setSpeed = function (s) {
   this._speed = s;
@@ -196,7 +196,7 @@ Timeline.prototype.setSpeed = function (s) {
   return this;
 };
 Timeline.prototype.setNextTurn = function (n) {
-  this._nextTurn = n;
+  this._next = n;
   this._updateFlag = true;
   return this;
 };
@@ -215,7 +215,7 @@ Timeline.prototype.animateChange = function (dS, dN, k) {
     // A change in speed also implies a change in
     // next-turn.  Compute an additional change in
     // next-turn.
-    var newnt = changeNextTurn( this._nextTurn
+    var newnt = changeNextTurn( this._next
                               , this._speed
                               , this._speed + dS
                               );
