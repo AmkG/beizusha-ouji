@@ -155,11 +155,14 @@ Player/enemy character states have the following fields:
 
 var PIXI = require('pixi');
 var UC = require('ui/UpdateContainer');
-var Curtain = require('ui/Curtain');
 
+var CharView = require('ui/CombatScreen/CharView');
+var Curtain = require('ui/Curtain');
 var GetReady = require('ui/CombatScreen/GetReady');
 
 function CombatScreen(cfg) {
+  var i = 0;
+
   // Get configuration.
   this._spritesheets = cfg.spritesheets.bind(cfg);
   this._skills = cfg.skills.bind(cfg);
@@ -181,7 +184,22 @@ function CombatScreen(cfg) {
     this._pixi.addChild(cfg.background);
   }
 
-  // TODO: actual combat interface.
+  /* Character views.  */
+  this._pviews = [];
+  this._eviews = [];
+  for (i = 0; i < 4; ++i) {
+    var pview = new CharView(96 - (i * 32));
+    uc.addChild(pview);
+    pview.pixiObj().x = 192 - (i * 64);
+    this._pixi.addChild(pview.pixiObj());
+    this._pviews.push(pview);
+
+    var eview = new CharView(96 - (i * 32));
+    uc.addChild(eview);
+    eview.pixiObj().x = 384 + (i * 64);
+    this._pixi.addChild(eview.pixiObj());
+    this._eviews.push(eview);
+  }
 
   // Curtain layer.
   this._curtain = new Curtain();
@@ -209,50 +227,75 @@ State machine
 
 function init(self) {
   var i = 0;
+
+  var cs = self._cs;
+
+  // Chain to the next function.
   function next() {
     --self._number;
     if (self._number !== 0) return;
     reveal(self);
   }
 
+  // Initialize the curtain.
   self._curtain.setWhite();
   self._curtain.hide();
 
-  var cs = self._cs;
-
+  // The number of continuations that must finish.
+  // We have a continuation for each player and
+  // enemy character, and a continuation for the
+  // GET READY! animation.
   self._number = cs.players.length +
                  cs.enemies.length +
                  1 ;
-  for (i = 0; i < 4; ++i) {
-    (function (i) {
-    if (i < cs.players.length) {
-      var player = cs.players[i];
-      var life = player.life;
-      if (typeof player.nextTurn === 'undefined' &&
-          player.life > 0) {
-        // TODO: set a random next-turn.
+
+  // Loads character spritesheets.
+  function loadSpritesheet(type, i, facing) {
+    var chr = cs[type][i];
+    var life = chr.life;
+    var speed = chr.speed;
+    if (typeof chr.nextTurn === 'undefined' &&
+        chr.life > 0) {
+      // TODO: set a random next-turn.
+    }
+    var nt = chr.nextTurn;
+    var views =
+      (type === 'players') ?   self._pviews :
+      /*otherwise*/            self._eviews ;
+    var view = views[i];
+    self._spritesheets(player.spritesheet, function (ss) {
+      view.enable();
+      view.setSprite(ss);
+      view.lifemeter.setLife(life);
+      if (life == 0) {
+        ss.face('south');
+        ss.stopHurt();
+        view.timeline.hide();
+      } else {
+        ss.face(facing);
+        ss.stop();
+        view.timeline.show();
+        view.timeline.setSpeed(speed);
+        view.timeline.setNextTurn(nt);
       }
-      self._spritesheets(player.spritesheet, function (ss) {
-        // TODO: show player view, install spritesheet.
-        next();
-      });
+
+      next();
+    });
+  }
+
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length) {
+      loadSpritesheet('players', i, 'east');
     } else {
-      // TODO: hide player view.
+      // Not enough player characters.
+      self._pviews[i].disable();
     }
 
     if (i < cs.enemies.length) {
-      var enemy = cs.enemies[i];
-      var life = enemy.life;
-      if (typeof enemy.nextTurn === 'undefined' &&
-          enemy.life > 0) {
-        // TODO: set a random next-turn.
-      }
-      self._spritesheets(enemy.spritesheet, function (ss) {
-        // TODO: show enemy view, install spritesheet.
-        next();
-      });
+      loadSpritesheet('enemies', i, 'west');
     } else {
-      // TODO: hide enemy view.
+      // Not enough enemy characters.
+      self._eviews[i].disable();
     }
     })(i);
   }
@@ -294,8 +337,13 @@ CombatScreen.prototype.update = function (api) {
   return this;
 };
 CombatScreen.prototype.leave = function (api) {
+  var i = 0;
   api.top.removeChild(this._pixi);
-  // TODO
+  // Clear spritesheets.
+  for (i = 0; i < 4; ++i) {
+    this._pviews[i].clearSprite();
+    this._eviews[i].clearSprite();
+  }
   return this;
 };
 
