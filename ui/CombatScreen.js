@@ -175,7 +175,7 @@ function CombatScreen(cfg) {
   var uc = new UC();
   this._allUpdate = uc.update.bind(uc);
 
-  this._pixi = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
 
   // Background layer.
   if (cfg.background) {
@@ -266,7 +266,7 @@ function init(self) {
       (type === 'players') ?   self._pviews :
       /*otherwise*/            self._eviews ;
     var view = views[i];
-    self._spritesheets(player.spritesheet, function (ss) {
+    self._spritesheets(chr.spritesheet, function (ss) {
       view.enable();
       view.setSprite(ss);
       view.lifemeter.setLife(life);
@@ -300,7 +300,6 @@ function init(self) {
       // Not enough enemy characters.
       self._eviews[i].disable();
     }
-    })(i);
   }
 
   self._getready.show(next);

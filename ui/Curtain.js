@@ -74,7 +74,7 @@ curtain.update()
 function nullFun() { }
 
 function Curtain() {
-  this._pixi = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
   this._rect = null;
 
   // Draw the black and white rectangles.
@@ -82,7 +82,7 @@ function Curtain() {
     var rv = new PIXI.Graphics();
     rv.beginFill(color, 1.0);
     rv.lineStyle(0, color, 1.0);
-    rv.drawRect(0,0 1,1);
+    rv.drawRect(0,0, 1,1);
     rv.endFill();
     rv.scale.x = 640;
     rv.scale.y = 360;

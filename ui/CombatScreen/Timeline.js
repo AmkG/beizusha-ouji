@@ -133,10 +133,10 @@ function Timeline() {
   this._updateFlag = true;
 
   // The PIXI container known by the client.
-  this._pixi = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
   // The actual PIXI container that actually contains
   // the items we need.
-  this._top = new PIXI.DrawingObjectContainer();
+  this._top = new PIXI.DisplayObjectContainer();
   this._pixi.addChild(this._top);
 
   // The timeline background.
@@ -288,7 +288,7 @@ function updateView(self) {
   }
   // Position turnpoint.
   var betweenTurns = self.getTimeBetweenTurns();
-  var distTurns = betwenTurns * timePixels;
+  var distTurns = betweenTurns * timePixels;
   var turns = Math.ceil(timelineHeight / distTurns) + 1;
   var i = 0;
   var y = 0;
@@ -307,7 +307,7 @@ function updateView(self) {
     clearTurnpoint(i);
   }
   // Set the alpha.
-  this._top.alpha = this._alpha;
+  self._top.alpha = self._alpha;
 }
 
 Timeline.prototype.update = function () {

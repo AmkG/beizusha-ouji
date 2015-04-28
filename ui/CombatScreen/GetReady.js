@@ -57,8 +57,8 @@ function nullFun() { }
 var speed = 0.09;
 
 function GetReady() {
-  this._pixi = new PIXI.DrawingObjectContainer();
-  this._top = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
+  this._top = new PIXI.DisplayObjectContainer();
   this._pixi.addChild(this._top);
   this._txt = new PIXI.Text("GET READY!",
   { font: 'italic 112px sans-serif'

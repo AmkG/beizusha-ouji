@@ -65,15 +65,15 @@ cview.update()
 
 var PIXI = require('pixi');
 var Timeline = require('ui/CombatScreen/Timeline');
-var LifeMeter = require('ui/CombaScreen/LifeMeter');
+var LifeMeter = require('ui/CombatScreen/LifeMeter');
 
 function CharView(charOffset) {
-  this._pixi = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
 
   this.timeline = new Timeline();
   this._pixi.addChild(this.timeline.pixiObj());
 
-  this._spriteContainer = new PIXI.DrawingObjectContainer();
+  this._spriteContainer = new PIXI.DisplayObjectContainer();
   this._spriteContainer.y = this.timeline.pixiObj().height +
                             charOffset ;
   this._pixi.addChild(this._spriteContainer);
@@ -86,7 +86,7 @@ function CharView(charOffset) {
   this._pixi.addChild(this.lifemeter.pixiObj());
 }
 CharView.prototype.pixiObj = function () {
-  return this;
+  return this._pixi;
 };
 CharView.prototype.setSprite = function (sprite) {
   this.sprite = sprite;

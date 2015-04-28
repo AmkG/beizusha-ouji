@@ -61,7 +61,7 @@ var animateSpeed = 1.0;
 function nullFun() {}
 
 function LifeMeter() {
-  this._pixi = new PIXI.DrawingObjectContainer();
+  this._pixi = new PIXI.DisplayObjectContainer();
 
   this._bak = new PIXI.Graphics();
   this._bak.beginFill(bakColor, 1.0);
