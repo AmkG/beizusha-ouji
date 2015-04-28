@@ -338,9 +338,15 @@ function judgeWinLose(self) {
   }
 
   if (pLose) {
-    this._goto = this._onLose;
+    self._curtain.setBlack();
+    self._curtain.fadeOut(function () {
+      this._goto = this._onLose;
+    });
   } else if (eLose) {
-    this._goto = this._onWin;
+    self._curtain.setWhite();
+    self._curtain.fadeOut(function () {
+      this._goto = this._onWin;
+    });
   } else {
     advanceTime(self);
   }
