@@ -74,13 +74,13 @@ function CharView(charOffset) {
   this._pixi.addChild(this.timeline.pixiObj());
 
   this._spriteContainer = new PIXI.DisplayObjectContainer();
-  this._spriteContainer.y = this.timeline.pixiObj().height +
+  this._spriteContainer.y = 248 +
                             charOffset ;
   this._pixi.addChild(this._spriteContainer);
   this.sprite = null;
 
   this.lifemeter = new LifeMeter();
-  this.lifemeter.pixiObj().y = this.timeline.pixiObj().height +
+  this.lifemeter.pixiObj().y = 248 +
                                charOffset +
                                64 - this.lifemeter.pixiObj().height ;
   this._pixi.addChild(this.lifemeter.pixiObj());

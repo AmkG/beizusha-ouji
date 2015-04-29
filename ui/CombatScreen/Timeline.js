@@ -97,7 +97,7 @@ var turnpointBorderColor    = 0xC0E0FF;
 var turnpointCenterColor    = 0xF0F0F0;
 // Dimensions.
 var timelineWidth           = 16;
-var timelineHeight          = 200;
+var timelineHeight          = 248;
 var timelineSideWidth       = 2;
 var turnpointWidth          = 32;
 var turnpointHeight         = 15;

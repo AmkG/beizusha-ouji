@@ -188,13 +188,13 @@ function CombatScreen(cfg) {
   this._pviews = [];
   this._eviews = [];
   for (i = 0; i < 4; ++i) {
-    var pview = new CharView(96 - (i * 32));
+    var pview = new CharView(48 - (i * 16));
     uc.addChild(pview);
     pview.pixiObj().x = 192 - (i * 64);
     this._pixi.addChild(pview.pixiObj());
     this._pviews.push(pview);
 
-    var eview = new CharView(96 - (i * 32));
+    var eview = new CharView(48 - (i * 16));
     uc.addChild(eview);
     eview.pixiObj().x = 384 + (i * 64);
     this._pixi.addChild(eview.pixiObj());
@@ -362,6 +362,7 @@ Public API
 CombatScreen.prototype.enter = function (api) {
   this._cs = api.gameState.combat;
 
+  api.top.removeChildren();
   api.top.addChild(this._pixi);
 
   this._goto = '';
