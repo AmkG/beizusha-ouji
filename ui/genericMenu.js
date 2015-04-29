@@ -394,7 +394,7 @@ Class.prototype.update = function (api) {
   }
 };
 Class.prototype.leave = function (api) {
-  if (this._menuTop.parent) {
+  if (this._menuTop && this._menuTop.parent) {
     this._menuTop.parent.removeChild(this._menuTop);
   }
   this._state = "finish";
