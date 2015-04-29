@@ -50,11 +50,11 @@ lm.update();
 - Call at each update point to update animation.
 */
 
-var bakColor = 0xFF8080;
-var lifeColor = 0xA0FFA0;
+var bakColor = 0xFF4040;
+var lifeColor = 0x40FF40;
 
 var meterWidth = 64;
-var meterHeight = 8;
+var meterHeight = 5;
 
 var animateSpeed = 1.0;
 
