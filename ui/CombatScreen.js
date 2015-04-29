@@ -418,8 +418,54 @@ function advanceTime(self) {
 
 function determineTurn(self) {
   /* Determine whose turn is next.  */
-  console.log("determineTurn");
-  /* TODO.  */
+  var i = 0;
+  var cs = self._cs;
+
+  var selected = false;
+
+  /* Go through enemies first.  */
+  for (i = 0; i < 4 && !selected; ++i) {
+    if (i < cs.enemies.length &&
+        cs.enemies[i].life > 0 &&
+        cs.enemies[i].nextTurn === 0) {
+      selected = true;
+      break;
+    }
+  }
+  if (selected) {
+    self._eviews[i].selector.blink(function () {
+      enemyTurn(self, i);
+    });
+    // Stop selection.
+    return;
+  }
+
+  /* Now go through players.  */
+  for (i = 0; i < 4 && !selected; ++i) {
+    if (i < cs.players.length &&
+        cs.players[i].life > 0 &&
+        cs.players[i].nextTurn === 0) {
+      selected = true;
+      break;
+    }
+  }
+  self._pviews[i].selector.blink(function () {
+    playerTurn(self, i);
+  });
+}
+
+//-----------------------------------------------------------------------------
+
+function enemyTurn(self, en) {
+  /* Enemy turn.  */
+  console.log("enemyTurn");
+}
+
+//-----------------------------------------------------------------------------
+
+function playerTurn(self, pn) {
+  /* Player turn.  */
+  console.log("playerTurn");
 }
 
 /*-----------------------------------------------------------------------------
