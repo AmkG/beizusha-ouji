@@ -54,14 +54,13 @@ tl.getNextTurn();
 tl.getTimeBetweenTurns();
 - Return the time between turns given the current speed.
 
-tl.animateChange(deltaSpeed, deltaNextTurn, function () {
+tl.animateChange(targetSpeed, targetNextTurn, function () {
   // ...
 });
 - Animate changing to the new speed and new next turn
   time.
-- Provide a delta or change in speed and next turn.
-- A delta in speed here implies a delta in next turn, in
-  addition to a delta in the given next-turn value.
+- Note that you are responsible for adjusting nextTurn if
+  you are also changing speed.
 - Call the given continuation function when animation
   completes.
 - At end of animation, the .getSpeed() and .getNextTurn()
@@ -109,7 +108,6 @@ var timePixels              = 0.75;
 function nullFun() {}
 
 var timeFromSpeed = slib.timeFromSpeed;
-var changeNextTurn = slib.changeNextTurn;
 
 function Timeline() {
   // Core settings.
@@ -205,27 +203,16 @@ Timeline.prototype.getTimeBetweenTurns = function () {
   return timeFromSpeed(this._speed);
 };
 
-Timeline.prototype.animateChange = function (dS, dN, k) {
+Timeline.prototype.animateChange = function (tS, tN, k) {
   if (this._animating !== 'none') {
     throw new Error("Timeline: animateChange: " +
                     "Animation on-going.");
   }
   this._animating = 'change';
-  if (dS !== 0) {
-    // A change in speed also implies a change in
-    // next-turn.  Compute an additional change in
-    // next-turn.
-    var newnt = changeNextTurn( this._next
-                              , this._speed
-                              , this._speed + dS
-                              );
-    var changent = newnt - curnt;
-    dN += changent;
-  }
   this._startSpeed = this._speed;
   this._startNext = this._next;
-  this._targetSpeed = this._speed + dS;
-  this._targetNext = this._next + dN;
+  this._targetSpeed = tS;
+  this._targetNext = tN;
   this._progress = 0.0;
   this._alpha = 1.0;
   this._callback = k;
