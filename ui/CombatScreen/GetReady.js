@@ -129,6 +129,7 @@ GetReady.prototype.update = function () {
       this._top.visible = false;
     }
     this._top.alpha = 1 - this._progress;
+    toCall();
   }
   return this;
 };
