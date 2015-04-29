@@ -50,6 +50,9 @@ cview.enable();
 cview.disable();
 - Hide or show the entire character view.
 
+cview.selector
+- The Selector component.
+
 cview.sprite
 - The spritesheet component.
 
@@ -66,9 +69,13 @@ cview.update()
 var PIXI = require('pixi');
 var Timeline = require('ui/CombatScreen/Timeline');
 var LifeMeter = require('ui/CombatScreen/LifeMeter');
+var Selector = require('ui/CombatScreen/Selector');
 
 function CharView(charOffset) {
   this._pixi = new PIXI.DisplayObjectContainer();
+
+  this.selector = new Selector();
+  this._pixi.addChild(this.selector.pixiObj());
 
   this.timeline = new Timeline();
   this._pixi.addChild(this.timeline.pixiObj());
@@ -108,6 +115,7 @@ CharView.prototype.enable = function () {
   return this;
 };
 CharView.prototype.update = function () {
+  this.selector.update();
   this.timeline.update();
   this.lifemeter.update();
   if (this.sprite) this.sprite.update();
