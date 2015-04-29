@@ -148,10 +148,10 @@ Curtain.prototype.fadeOut = function (kont) {
   return this;
 };
 // Determines how fast fadein/fadeout occurs.
-var step = 0.05;
+var stepSetting = 0.05;
 Curtain.prototype.update = function () {
   if (this._animating) {
-    var step = this._speed * this._dir * step;
+    var step = this._speed * this._dir * stepSetting;
 
     this._progress += step;
 
