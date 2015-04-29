@@ -76,6 +76,9 @@ var menu =
   , { item: "Test Sprites"
     , action: function (api) { api.setScreen('testSprites'); }
     }
+  , { item: "Test Combat"
+    , action: function (api) { api.setScreen('testCombat'); }
+    }
   ];
 var menuEsc = -1;
 /* If process and process.exit exist, add an 'exit' entry.
