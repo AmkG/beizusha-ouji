@@ -358,6 +358,68 @@ function judgeWinLose(self) {
 
 function advanceTime(self) {
   /* Advances the time.  */
+  var i = 0;
+
+  var cs = self._cs;
+
+  function next() {
+    --self._number;
+    if (self._number !== 0) return;
+    determineTurn(self);
+  }
+
+  /* Fix the display and determine how much to advance. */
+  var animations = 0;
+  var shortestTime = Infinity;
+  function process(chr, view) {
+    /* Fix the times.  */
+    view.timeline.setSpeed(chr.speed);
+    view.timeline.setNextTurn(chr.nextTurn);
+    /* Fix the lives.  */
+    view.lifemeter.setLife(chr.life);
+    /* Determine number of animations and how much to advance.  */
+    if (chr.nextTurn < shortestTime) {
+      shortestTime = chr.nextTurn;
+    }
+    ++animations;
+  }
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length &&
+        cs.players[i].life > 0) {
+      process(cs.players[i], self._pviews[i]);
+    }
+    if (i < cs.enemies.length &&
+       cs.enemies[i].life > 0) {
+      process(cs.enemies[i], self._eviews[i]);
+    }
+  }
+
+  /* Initiate the animations.  */
+  self._number = animations;
+  function animate(chr, view) {
+    chr.nextTurn -= shortestTime;
+    view.timeline.animateAdvance(shortestTime, function () {
+      view.timeline.setNextTurn(chr.nextTurn);
+      next();
+    });
+  }
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length &&
+        cs.players[i].life > 0) {
+      animate(cs.players[i], self._pviews[i]);
+    }
+    if (i < cs.enemies.length &&
+        cs.enemies[i].life > 0) {
+      animate(cs.enemies[i], self._eviews[i]);
+    }
+  }
+  self._saveState = true;
+}
+
+function determineTurn(self) {
+  /* Determine whose turn is next.  */
+  console.log("determineTurn");
+  /* TODO.  */
 }
 
 /*-----------------------------------------------------------------------------
