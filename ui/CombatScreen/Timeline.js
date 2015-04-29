@@ -96,15 +96,15 @@ var timelineCenterColor     = 0xE0F0FF;
 var turnpointBorderColor    = 0xC0E0FF;
 var turnpointCenterColor    = 0xF0F0F0;
 // Dimensions.
-var timelineWidth           = 16;
+var timelineWidth           = 8;
 var timelineHeight          = 248;
 var timelineSideWidth       = 2;
 var turnpointWidth          = 32;
-var turnpointHeight         = 15;
-var turnpointCornerRadius   = 4;
+var turnpointHeight         = 10;
+var turnpointCornerRadius   = 4.5;
 var turnpointBorderWidth    = 2;
 // Conversion from time units to pixel coords.
-var timePixels              = 0.5;
+var timePixels              = 0.75;
 
 function nullFun() {}
 
