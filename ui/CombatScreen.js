@@ -158,6 +158,7 @@ var UC = require('ui/UpdateContainer');
 
 var MenuAsync = require('ui/genericMenu').AsyncClass;
 var CharView = require('ui/CombatScreen/CharView');
+var CharMenu = require('ui/CombatScreen/CharMenu');
 var Curtain = require('ui/Curtain');
 var GetReady = require('ui/CombatScreen/GetReady');
 
@@ -219,6 +220,18 @@ function CombatScreen(cfg) {
   // Menu.
   this._menu = new MenuAsync({});
   uc.addChild(this._menu);
+
+  // Character selection menus.
+  this._pmenu = new CharMenu(
+    { viewArray: this._pviews
+    , side: 'players'
+    });
+  this._emenu = new CharMenu(
+    { viewArray: this._eviews
+    , side: 'enemies'
+    });
+  uc.addChild(this._pmenu);
+  uc.addChild(this._emenu);
 
   // Reference to combat state.
   this._cs = null;
@@ -456,7 +469,6 @@ function determineTurn(self) {
     }
   }
   self._pviews[i].selector.blink(function () {
-    self._pviews[i].selector.show();
     playerTurn(self, i);
   });
 }
@@ -469,6 +481,9 @@ function enemyTurn(self, en) {
 }
 
 //-----------------------------------------------------------------------------
+
+// Used to handle player skill based on skill .target slot
+var playerSkillHandle = {};
 
 function playerTurn(self, pn) {
   /* Player turn.  Prepare menu.  */
@@ -499,13 +514,19 @@ function playerTurn(self, pn) {
   var escSel = menuItems.length;
   menuItems.push("Game Menu");
 
+  self._pviews[pn].selector.show();
+
   self._menu.setEsc(escSel);
   self._menu.setItems(menuItems);
   self._menu.getSelection(function (sel) {
     if (sel === escSel) {
       playerGameMenu(self, pn);
     } else if (sel === itemSel) {
+      // TODO.
     } else {
+      var skill = skillDefs[sel];
+      var target = skill.target;
+      playerSkillHandle[target](self, pn, sel, skill);
     }
   });
 }
@@ -525,6 +546,53 @@ function playerGameMenu(self, pn) {
     }
   });
 }
+
+playerSkillHandle.enemy = function (self, pn, sn, skill) {
+  /* Select an enemy target.  */
+
+  // Remove selector on player character to prevent
+  // user confusion.
+  self._pviews[pn].selector.hide();
+
+  self._emenu.getSelection(function (en) {
+    if (en === -1) {
+      playerTurn(self, pn);
+    } else {
+      // TODO.
+    }
+  });
+};
+playerSkillHandle.ally = function (self, pn, sn, skill) {
+  /* Select an ally target.  */
+
+  // Remove selector on player character to prevent
+  // user confusion.
+  self._pviews[pn].selector.hide();
+
+  self._pmenu.getSelection(function (an) {
+    if (an === -1) {
+      playerTurn(self, pn);
+    } else {
+      // TODO.
+    }
+  });
+};
+playerSkillHandle.enemies = function (self, pn, sn, skill) {
+  /* Affect all enemies.  */
+  // TODO.
+};
+playerSkillHandle.allies = function (self, pn, sn, skill) {
+  /* Affect all allies.  */
+  // TODO.
+};
+playerSkillHandle.self = function (self, pn, sn, skill) {
+  /* Affect player character.  */
+  // TODO.
+};
+playerSkillHandle.all = function (self, pn, sn, skill) {
+  /* Affect all characters in combat  */
+  // TODO.
+};
 
 /*-----------------------------------------------------------------------------
 Public API
