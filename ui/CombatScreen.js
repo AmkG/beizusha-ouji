@@ -156,6 +156,7 @@ Player/enemy character states have the following fields:
 var PIXI = require('pixi');
 var UC = require('ui/UpdateContainer');
 
+var MenuAsync = require('ui/genericMenu').AsyncClass;
 var CharView = require('ui/CombatScreen/CharView');
 var Curtain = require('ui/Curtain');
 var GetReady = require('ui/CombatScreen/GetReady');
@@ -214,6 +215,10 @@ function CombatScreen(cfg) {
   this._getready = new GetReady();
   uc.addChild(this._getready);
   this._pixi.addChild(this._getready.pixiObj());
+
+  // Menu.
+  this._menu = new MenuAsync({});
+  uc.addChild(this._menu);
 
   // Reference to combat state.
   this._cs = null;
@@ -434,6 +439,7 @@ function determineTurn(self) {
   }
   if (selected) {
     self._eviews[i].selector.blink(function () {
+      self._eviews[i].selector.show();
       enemyTurn(self, i);
     });
     // Stop selection.
@@ -450,6 +456,7 @@ function determineTurn(self) {
     }
   }
   self._pviews[i].selector.blink(function () {
+    self._pviews[i].selector.show();
     playerTurn(self, i);
   });
 }
@@ -464,8 +471,59 @@ function enemyTurn(self, en) {
 //-----------------------------------------------------------------------------
 
 function playerTurn(self, pn) {
-  /* Player turn.  */
-  console.log("playerTurn");
+  /* Player turn.  Prepare menu.  */
+  var cs = self._cs;
+
+  var chr = cs.players[pn];
+  var skills = chr.skills;
+
+  var skillDefs = [];
+  var menuItems = [];
+
+  var i = 0;
+
+  for (i = 0; i < skills.length; ++i) {
+    var skillKey = skills[i];
+    var skill = self._skills(skillKey);
+    skillDefs.push(skill);
+    menuItems.push(skill.name);
+  }
+
+  var hasItems = cs.playerItems.length !== 0;
+  var itemSel = -1;
+  if (hasItems) {
+    itemSel = menuItems.length;
+    menuItems.push("Use Item");
+  }
+
+  var escSel = menuItems.length;
+  menuItems.push("Game Menu");
+
+  self._menu.setEsc(escSel);
+  self._menu.setItems(menuItems);
+  self._menu.getSelection(function (sel) {
+    if (sel === escSel) {
+      playerGameMenu(self, pn);
+    } else if (sel === itemSel) {
+    } else {
+    }
+  });
+}
+
+function playerGameMenu(self, pn) {
+  /* Handle the game menu.  */
+  self._menu.setItems(["Resume Combat", "Exit to Main Menu"]);
+  self._menu.setEsc(0);
+  self._menu.getSelection(function (sel) {
+    if (sel === 0) {
+      playerTurn(self, pn);
+    } else {
+      self._curtain.setWhite();
+      self._curtain.fadeOut(function () {
+        self._goto = self._onExit;
+      });
+    }
+  });
 }
 
 /*-----------------------------------------------------------------------------
