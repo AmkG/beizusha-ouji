@@ -160,6 +160,10 @@ var CharView = require('ui/CombatScreen/CharView');
 var Curtain = require('ui/Curtain');
 var GetReady = require('ui/CombatScreen/GetReady');
 
+var speed = require('ui/CombatScreen/speed');
+var timeFromSpeed = speed.timeFromSpeed;
+var changeNextTurn = speed.changeNextTurn;
+
 function CombatScreen(cfg) {
   var i = 0;
 
@@ -259,7 +263,8 @@ function init(self) {
     var speed = chr.speed;
     if (typeof chr.nextTurn === 'undefined' &&
         chr.life > 0) {
-      // TODO: set a random next-turn.
+      var maxTime = timeFromSpeed(speed);
+      chr.nextTurn = maxTime * Math.random();
     }
     var nt = chr.nextTurn;
     var views =
