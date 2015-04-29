@@ -33,7 +33,7 @@ define(['pixi', 'ui/CombatScreen/speed'], function (PIXI, slib) {
 var tl = new Timeline();
 - Create a new timeline at the given location.
 - Speed defaults to 100 and nextTurn defaults to 100.
-- Timelines have width 64 and height 200.
+- Timelines have width 64 and height 248.
 
 tl.pixiObj();
 - Return the PIXI drawing object for this timeline.
@@ -299,7 +299,7 @@ function updateView(self) {
   // Position the turnpoints.
   y = self.getNextTurn() * timePixels;
   for (i = 0; i < turns; ++i) {
-    setTurnpoint(i, 200 - y);
+    setTurnpoint(i, timelineHeight - y);
     y += distTurns;
   }
   // Hide extra turnpoints;
