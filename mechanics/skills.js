@@ -102,6 +102,17 @@ Character interfaces
 The .apply() function is provided character interfaces.  These
 are objects whose public slots are the following methods:
 
+.life()
+- Returns the current life.  Scaled from 0 to 100.
+
+.nextTurn()
+- Returns the time to the character's next turn.
+- Typical time between turns is 100.
+
+.speed()
+- Returns the speed of the character.
+- Increasing speed reduces time between turns.
+
 .resists()
 - Returns an object containing the resistances of the character.
 - The resistances object has a slot for each element.  For
