@@ -608,12 +608,6 @@ function skillInitiate(self, cside, cn, sn, tn) {
           the skill is not 'enemy' or 'ally', ignored.
   */
 
-  function next() {
-    --self._number;
-    if (self._number !== 0) return;
-    skillApply(self, cside, cn, sn, tn);
-  }
-
   // Enemy side.
   var eside =
     cside === 'players' ? 'enemies' : 'players' ;
@@ -663,6 +657,59 @@ function skillInitiate(self, cside, cn, sn, tn) {
     ++self._number;
   }
 
+  // --- Apply skill.
+
+  function next() {
+    --self._number;
+    if (self._number !== 0) return;
+    skillApply();
+  }
+  function skillApply() {
+    cs = self._cs;
+    var model = self._charmodels.startStep(cs);
+
+    var casterModel =
+      cside === 'players' ? model.playerChar(cn) :
+      /*otherwise*/         model.enemyChar(cn) ;
+
+    switch(target) {
+    case 'all': {
+      var amodels = model.livingEnemyChars();
+      amodels = amodels.concat(model.livingPlayerChars());
+      skillDef.apply(casterModel, amodels);
+    } break;
+    case 'allies': {
+      var amodels =
+        cside === 'players' ? model.livingPlayerChars() :
+        /*otherwise*/         model.livingEnemyChars() ;
+      skillDef.apply(casterModel, amodels);
+    } break;
+    case 'enemies': {
+      var emodels =
+        eside === 'players' ? model.livingPlayerChars() :
+        /*otherwise*/         model.livingEnemyChars() ;
+      skillDef.apply(casterModel, emodels);
+    } break;
+    case 'self': {
+      skillDef.apply(casterModel, casterModel);
+    } break;
+    case 'ally': {
+      var amodel =
+        cside === 'players' ? model.playerChar(tn) :
+        /*otherwise*/         model.enemyChar(tn) ;
+      skillDef.apply(casterModel, amodel);
+    } break;
+    case 'enemy': {
+      var emodel =
+        eside === 'players' ? model.playerChar(tn) :
+        /*otherwise*/         model.enemyChar(tn) ;
+      skillDef.apply(casterModel, emodel);
+    } break;
+    }
+
+    skillApplyAnimate(self, model);
+  }
+
   // --- Inititate animations.
 
   // Caster animation.
@@ -701,9 +748,9 @@ function skillInitiate(self, cside, cn, sn, tn) {
   }
 }
 
-function skillApply(self, cside, cn, sn, tn) {
-  /* Actually apply the skill.  */
-  console.log("skillApply");
+function skillApplyAnimate(self, model) {
+  /* Animate the result of skill application.  */
+  console.log("skillApplyAnimate");
 }
 
 /*-----------------------------------------------------------------------------
