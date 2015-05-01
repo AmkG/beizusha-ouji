@@ -56,6 +56,7 @@ var combat =
     , damage: { normal: 18, order: 5 }
     , element: 'order'
     , skills: [ 'slash', 'prismatic', 'justice', 'blackblade' ]
+    , stats: { strength: 12, dexterity: 8, magic: 8, vitality: 10}
     }
   , { name: "Eowylle"
     , speed: 15
@@ -65,6 +66,7 @@ var combat =
     , damage: { normal: 20, life: 4 }
     , element: 'life'
     , skills: [ 'shoot', 'multishoot', 'lightarrow' ]
+    , stats: { strength: 8, dexterity: 12, magic: 8, vitality: 10}
     }
   , { name: "Rand"
     , speed: 0
@@ -74,6 +76,7 @@ var combat =
     , damage: { normal: 18, dark: 22 }
     , element: 'dark'
     , skills: [ 'slash', 'terrify', 'blackblade']
+    , stats: { strength: 14, dexterity: 8, magic: 8, vitality: 10}
     }
   ]
 , playerItems:
@@ -88,6 +91,7 @@ var combat =
     , damage: { }
     , element: 'light'
     , skills: [ 'flash', 'heal', 'impositionoflaw', 'drain' ]
+    , stats: { strength: 6, dexterity: 6, magic: 16, vitality: 12}
     }
   ]
 };
