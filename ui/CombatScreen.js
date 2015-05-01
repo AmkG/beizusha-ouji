@@ -161,6 +161,7 @@ var PIXI = require('pixi');
 var UC = require('ui/UpdateContainer');
 
 var MenuAsync = require('ui/genericMenu').AsyncClass;
+var CharModels = require('ui/CombatScreen/CharModels');
 var CharView = require('ui/CombatScreen/CharView');
 var CharMenu = require('ui/CombatScreen/CharMenu');
 var Curtain = require('ui/Curtain');
@@ -236,6 +237,9 @@ function CombatScreen(cfg) {
     });
   uc.addChild(this._pmenu);
   uc.addChild(this._emenu);
+
+  // Character models.
+  this._charmodels = new CharModels();
 
   // Reference to combat state.
   this._cs = null;
