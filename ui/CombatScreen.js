@@ -144,6 +144,10 @@ Player/enemy character states have the following fields:
 .spritesheet
 - A String referring to the spritesheet for the character.
 
+.stats
+- An Object whose fields contain the stats of the character.
+- .stats.strength, .stats.dexterity, .stats.magic, .stats.vitality
+
 .skills
 - An Array containing Strings identifying the skills of
   the character.
