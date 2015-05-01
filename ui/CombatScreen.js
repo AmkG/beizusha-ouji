@@ -534,7 +534,7 @@ function playerTurn(self, pn) {
     } else {
       var skill = skillDefs[sel];
       var target = skill.target;
-      playerSkillHandle[target](self, pn, sel, skill);
+      playerSkillHandle[target](self, pn, sel);
     }
   });
 }
@@ -555,7 +555,7 @@ function playerGameMenu(self, pn) {
   });
 }
 
-playerSkillHandle.enemy = function (self, pn, sn, skill) {
+playerSkillHandle.enemy = function (self, pn, sn) {
   /* Select an enemy target.  */
 
   // Remove selector on player character to prevent
@@ -566,11 +566,11 @@ playerSkillHandle.enemy = function (self, pn, sn, skill) {
     if (en === -1) {
       playerTurn(self, pn);
     } else {
-      // TODO.
+      skillInitiate(self, 'players', pn, sn, en);
     }
   });
 };
-playerSkillHandle.ally = function (self, pn, sn, skill) {
+playerSkillHandle.ally = function (self, pn, sn) {
   /* Select an ally target.  */
 
   // Remove selector on player character to prevent
@@ -581,26 +581,130 @@ playerSkillHandle.ally = function (self, pn, sn, skill) {
     if (an === -1) {
       playerTurn(self, pn);
     } else {
-      // TODO.
+      skillInitiate(self, 'players', pn, sn, an);
     }
   });
 };
-playerSkillHandle.enemies = function (self, pn, sn, skill) {
-  /* Affect all enemies.  */
-  // TODO.
+playerSkillHandle.enemies =
+playerSkillHandle.allies =
+playerSkillHandle.self =
+playerSkillHandle.all = function (self, pn, sn) {
+  // No need to select, just have skill initiation
+  // done immediately.
+  skillInitiate(self, 'players', pn, sn, -1);
 };
-playerSkillHandle.allies = function (self, pn, sn, skill) {
-  /* Affect all allies.  */
-  // TODO.
-};
-playerSkillHandle.self = function (self, pn, sn, skill) {
-  /* Affect player character.  */
-  // TODO.
-};
-playerSkillHandle.all = function (self, pn, sn, skill) {
-  /* Affect all characters in combat  */
-  // TODO.
-};
+
+//-----------------------------------------------------------------------------
+
+function skillInitiate(self, cside, cn, sn, tn) {
+  /* Initially animate the character performing the
+     skill.  */
+  /* cside = String, either 'players' or 'enemies'.  The side
+             of the character.
+     cn = the index number of the character doing
+          the skill.
+     sn = the index number of the skill.
+     tn = the index number of the target of the skill.  If
+          the skill is not 'enemy' or 'ally', ignored.
+  */
+
+  function next() {
+    --self._number;
+    if (self._number !== 0) return;
+    skillApply(self, cside, cn, sn, tn);
+  }
+
+  // Enemy side.
+  var eside =
+    cside === 'players' ? 'enemies' : 'players' ;
+
+  var cs = self._cs;
+  var sviews =
+    cside === 'players' ? self._pviews : self._eviews ;
+  var eviews =
+    eside === 'players' ? self._pviews : self._eviews ;
+  var caster = cs[cside][cn];
+  var skey = caster.skills[sn];
+  var skillDef = self._skills(skey);
+  var sname = skillDef.name;
+
+  var i = 0;
+
+  // Clear selectors.
+  for (i = 0; i < 4; ++i) {
+    self._pviews[i].selector.hide();
+    self._eviews[i].selector.hide();
+  }
+
+  // --- Count number of animations.
+
+  // One animation for the caster moving.
+  self._number = 1;
+
+  // Determine number based on selectors.
+  var target = skillDef.target;
+  if (target === 'allies' ||
+      target === 'all') {
+    var smodels = cs[cside];
+    for (i = 0; i < smodels.length; ++i) {
+      if (smodels[i].life > 0) ++self._number;
+    }
+  }
+  if (target === 'enemies' ||
+      target === 'all') {
+    var emodels = cs[eside];
+    for (i = 0; i < emodels.length; ++i) {
+      if (emodels[i].life > 0) ++self._number;
+    }
+  }
+  if (target === 'ally' ||
+      target === 'enemy' ||
+      target === 'self') {
+    ++self._number;
+  }
+
+  // --- Inititate animations.
+
+  // Caster animation.
+  var animation = skillDef.animation;
+  sviews[cn].sprite[animation](function() {
+    sviews[cn].sprite.stop();
+    next();
+  });
+
+  if (target === 'enemies' ||
+      target === 'all') {
+    var emodels = cs[eside];
+    for (i = 0; i < emodels.length; ++i) {
+      if (emodels[i].life > 0) {
+        eviews[i].selector.blink(next);
+      }
+    }
+  }
+  if (target === 'allies' ||
+      target === 'all') {
+    var smodels = cs[eside];
+    for (i = 0; i < smodels.length; ++i) {
+      if (smodels[i].life > 0) {
+        sviews[i].selector.blink(next);
+      }
+    }
+  }
+  if (target === 'self') {
+    sviews[cn].selector.blink(next);
+  }
+  if (target === 'ally') {
+    sviews[tn].selector.blink(next);
+  }
+  if (target === 'enemy') {
+    eviews[tn].selector.blink(next);
+  }
+}
+
+function skillApply(self, cside, cn, sn, tn) {
+  /* Actually apply the skill.  */
+  console.log("skillApply");
+}
 
 /*-----------------------------------------------------------------------------
 Public API
