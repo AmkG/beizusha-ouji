@@ -116,7 +116,7 @@ LifeMeter.prototype.animateSetLife = function (v, k) {
 LifeMeter.prototype.update = function () {
   if (this._dir == 0.0) return this;
   this._life += this._dir * animateSpeed;
-  if (this._life * this._dir >= this._life * this._dir) {
+  if (this._life * this._dir >= this._targetLife * this._dir) {
     // Limit reached.
     var toCall = this._callback;
     this._life = this._targetLife;
