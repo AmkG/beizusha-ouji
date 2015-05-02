@@ -48,7 +48,7 @@ function timeFromSpeed(speed) {
 function changeNextTurn(nextTurn, oldSpeed, newSpeed) {
   var oldTime = timeFromSpeed(oldSpeed);
   var newTime = timeFromSpeed(newSpeed);
-  return nextTurn * newTime / curTime;
+  return nextTurn * newTime / oldTime;
 }
 
 exports.timeFromSpeed = timeFromSpeed;
