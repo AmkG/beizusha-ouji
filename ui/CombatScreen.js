@@ -724,12 +724,12 @@ function skillInitiate(self, cside, cn, sn, tn) {
     // If speed changed, modify nextTurn.
     function handleSpeedChange(cmodel, cr) {
       if (cr.didSpeedChange()) {
-        var curspeed = cmodel.curSpeed();
-        var tgtspeed = cmodel.targetSpeed();
-        var curnt    = cmodel.targetNextTurn();
+        var curspeed = cr.curSpeed();
+        var tgtspeed = cr.targetSpeed();
+        var curnt    = cr.targetNextTurn();
         var tgtnt    = changeNextTurn(curnt, curspeed, tgtspeed);
         var diffnt   = tgtnt - curnt;
-        cmodel.changeNextTurn(diffnt);
+        cmodel.delay(diffnt);
       }
     }
     var pmodels = model.playerChars();
