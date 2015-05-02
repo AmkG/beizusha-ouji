@@ -417,7 +417,9 @@ skills.justice =
 
   for (i = 0; i < element.types.length; ++i) {
     el = element.types[i];
-    totalAttack += attack[el];
+    if (attack[el]) {
+      totalAttack += attack[el];
+    }
   }
   if (caster.element() == 'order') {
     totalAttack *= 1.1;
@@ -565,7 +567,9 @@ skills.berserk =
 
   for (i = 0; i < element.types.length; ++i) {
     el = element.types[i];
-    totalAttack += attack[el];
+    if (attack[el]) {
+      totalAttack += attack[el];
+    }
   }
   if (caster.element() == 'chaos') {
     totalAttack *= 1.05;
