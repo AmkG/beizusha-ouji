@@ -679,6 +679,14 @@ function skillInitiate(self, cside, cn, sn, tn) {
       sviews[cn].timeline.setNextTurn(nt);
     }
 
+    // If the skill is single-use, remove it.
+    if (skillDef.singleUse) {
+      var skillsArray =
+        (cside === 'players') ?  cs.players[cn].skills :
+        /*otherwise*/            cs.enemies[cn].skills ;
+      skillsArray.splice(sn, 1);
+    }
+
     // Start the model.
     var model = self._charmodels.startStep(cs);
 
