@@ -200,6 +200,7 @@ function getAttackCommon(caster, strFactor, dexFactor) {
   var bonusBase = stats.strength * strFactor + stats.dexterity * dexFactor;
   var bonusNormal = bonusBase;
   var bonusElem = bonusBase / 2;
+  var bonus = 0.0;
   var rv = {};
 
   var i = 0;
