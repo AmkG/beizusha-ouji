@@ -665,7 +665,21 @@ function skillInitiate(self, cside, cn, sn, tn) {
     skillApply();
   }
   function skillApply() {
-    cs = self._cs;
+    var i = 0;
+    var cs = self._cs;
+
+    // Advance next turn for caster.
+    if (cside === 'players') {
+      var nt = timeFromSpeed(cs.players[cn].speed);
+      cs.players[cn].nextTurn = nt;
+      sviews[cn].timeline.setNextTurn(nt);
+    } else {
+      var nt = timeFromSpeed(cs.enemies[cn].speed);
+      cs.enemies[cn].nextTurn = nt;
+      sviews[cn].timeline.setNextTurn(nt);
+    }
+
+    // Start the model.
     var model = self._charmodels.startStep(cs);
 
     var casterModel =
@@ -707,6 +721,28 @@ function skillInitiate(self, cside, cn, sn, tn) {
     } break;
     }
 
+    // If speed changed, modify nextTurn.
+    function handleSpeedChange(cmodel, cr) {
+      if (cr.didSpeedChange()) {
+        var curspeed = cmodel.curSpeed();
+        var tgtspeed = cmodel.targetSpeed();
+        var curnt    = cmodel.targetNextTurn();
+        var tgtnt    = changeNextTurn(curnt, curspeed, tgtspeed);
+        var diffnt   = tgtnt - curnt;
+        cmodel.changeNextTurn(diffnt);
+      }
+    }
+    var pmodels = model.playerChars();
+    var emodels = model.enemyChars();
+    for (i = 0; i < 4; ++i) {
+      if (i < pmodels.length) {
+        handleSpeedChange(pmodels[i], model.playerChangeRecord(i));
+      }
+      if (i < emodels.length) {
+        handleSpeedChange(emodels[i], model.enemyChangeRecord(i));
+      }
+    }
+
     skillApplyAnimate(self, model);
   }
 
@@ -746,11 +782,105 @@ function skillInitiate(self, cside, cn, sn, tn) {
   if (target === 'enemy') {
     eviews[tn].selector.blink(next);
   }
+
 }
 
-function skillApplyAnimate(self, model) {
+function skillApplyAnimate(self, topModel) {
   /* Animate the result of skill application.  */
-  console.log("skillApplyAnimate");
+  var i = 0;
+  var todo = [];
+
+  function next() {
+    --self._number;
+    if (self._number !== 0) return;
+    skillApplyFinish(self);
+  }
+
+  var cs = self._cs;
+
+  // Figure out the view-updating models.
+  function updateView(view, model) {
+    var dieFlag = false;
+    if (model.didLifeChange()) {
+      todo.push(function() {
+        view.lifemeter.setLife(model.curLife());
+        view.lifemeter.animateSetLife(model.targetLife(), next);
+      });
+      if (model.targetLife() === 0) {
+        // Suppress any timeline update.
+        dieFlag = true;
+        // Do hurt animation and hide timeline.
+        todo.push(function () {
+          view.sprite.face('south');
+          view.sprite.hurt(next);
+        });
+        todo.push(function () {
+          view.timeline.animateHide(next);
+        });
+      }
+    }
+    if (!dieFlag &&
+        (model.didSpeedChange() ||
+         model.didNextTurnChange())) {
+      todo.push(function () {
+        view.timeline.setSpeed(model.curSpeed());
+        view.timeline.setNextTurn(model.curNextTurn());
+        view.timeline.animateChange(
+          model.targetSpeed(), model.targetNextTurn(), next
+        );
+      });
+    }
+  }
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length &&
+        cs.players[i].life > 0) {
+      updateView(self._pviews[i], topModel.playerChangeRecord(i));
+    }
+    if (i < cs.enemies.length &&
+        cs.enemies[i].life > 0) {
+      updateView(self._eviews[i], topModel.enemyChangeRecord(i));
+    }
+  }
+
+  // Handle the animations to do.
+  self._number = todo.length;
+  for (i = 0; i < todo.length; ++i) {
+    todo[i]();
+  }
+
+  // Now commit the model.
+  topModel.commit();
+  self._saveState = true;
+}
+function skillApplyFinish(self) {
+  /* Handle after applying skill.  */
+  var cs = self._cs;
+  var i = 0;
+  function updateView(view, model) {
+    view.lifemeter.setLife(model.life);
+    if (model.life > 0) {
+      view.timeline.show();
+      view.timeline.setSpeed(model.speed);
+      view.timeline.setNextTurn(model.nextTurn);
+    } else {
+      view.timeline.hide();
+      view.sprite.face('south');
+      view.sprite.stopHurt();
+    }
+  }
+  for (i = 0; i < 4; ++i) {
+    if (i < cs.players.length) {
+      updateView(self._pviews[i], cs.players[i]);
+    } else {
+      self._pviews[i].disable();
+    }
+    if (i < cs.enemies.length) {
+      updateView(self._eviews[i], cs.enemies[i]);
+    } else {
+      self._eviews[i].disable();
+    }
+  }
+  judgeWinLose(self);
 }
 
 /*-----------------------------------------------------------------------------
